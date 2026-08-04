@@ -1,145 +1,99 @@
 const recipeContainer = document.getElementById("recipeContainer");
 const searchInput = document.getElementById("searchInput");
-
 const dropdownBtn = document.getElementById("dropdownBtn");
 const dropdownMenu = document.getElementById("dropdownMenu");
 const loginBtn = document.getElementById("loginBtn");
 
-/* --------------------------
-DISPLAY RECIPES
----------------------------*/
+/* Recipes */
 
 function displayRecipes(recipeList){
-
     recipeContainer.innerHTML = "";
-
     recipeList.forEach(recipe=>{
-
         recipeContainer.innerHTML += `
-
         <div class="recipe-card">
-
             <img
                 src="${recipe.image}"
                 class="recipe-image"
                 alt="${recipe.title}"
             >
-
             <div class="recipe-content">
-
                 <h3 class="recipe-title">
                     ${recipe.title}
                 </h3>
-
                 <p class="recipe-author">
                     By ${recipe.author}
                 </p>
-
                 <div class="recipe-footer">
-
                     <span class="time">
                         ${recipe.time}
                     </span>
-
-                    <span
+                    <img
+                        src="${
+                            recipe.favourite
+                            ? 'images/icons/images/icons/HeartFilled.png'
+                            : 'images/icons/HeartUnfilled.png'
+                        }"
                         class="heart"
-                        onclick="toggleFavourite(${recipe.id})"
+                        onclick="toggleFavourite(${recipe.id}, this)"
+                        alt="Favourite"
                     >
-                        ${recipe.favourite ? "❤️" : "🤍"}
-                    </span>
-
                 </div>
-
             </div>
-
         </div>
-
         `;
-
     });
-
 }
 
 displayRecipes(recipes);
 
-/* --------------------------
-SEARCH
----------------------------*/
+/* Search */
 
-searchInput.addEventListener("keyup", function(){
-
-    const keyword = this.value.toLowerCase();
-
-    const filtered = recipes.filter(recipe=>{
-
-        return recipe.title.toLowerCase().includes(keyword);
-
-    });
-
-    displayRecipes(filtered);
-
+searchInput.addEventListener("keyup", () => {
+    const keyword = searchInput.value.toLowerCase();
+    displayRecipes(
+        recipes.filter(recipe =>
+            recipe.title.toLowerCase().includes(keyword)
+        )
+    );
 });
 
-/* --------------------------
-FAVOURITE
----------------------------*/
+/* Favourite */
 
-function toggleFavourite(id){
-
-    const recipe = recipes.find(item=>item.id===id);
-
+function toggleFavourite(id, heart){
+    const recipe = recipes.find(recipe => recipe.id === id);
     recipe.favourite = !recipe.favourite;
-
-    displayRecipes(recipes);
-
+    if(recipe.favourite){
+        heart.src = "images/icons/HeartFilled.png";
+    }else{
+        heart.src = "images/icons/HeartUnfilled.png";
+    }
 }
 
-/* --------------------------
-LOGIN
----------------------------*/
+/* Login */
 
 loginBtn.addEventListener("click",()=>{
-
     window.location="login.html";
-
 });
 
-/* --------------------------
-DROPDOWN
----------------------------*/
+/* Dropdown */
 
 dropdownBtn.addEventListener("click",(e)=>{
-
     e.stopPropagation();
-
     if(dropdownMenu.style.display==="block"){
-
         dropdownMenu.style.display="none";
-
     }else{
-
         dropdownMenu.style.display="block";
-
     }
-
 });
 
-/* --------------------------
-HIDE DROPDOWN
----------------------------*/
+/* Hide Dropdown */
 
 window.addEventListener("click",()=>{
-
     dropdownMenu.style.display="none";
-
 });
 
-/* --------------------------
-LOGIN OPTION
----------------------------*/
+/* Login Option */
 
 document.querySelector(".login-item").addEventListener("click",()=>{
-
     window.location="login.html";
-
 });

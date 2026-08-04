@@ -1,7 +1,3 @@
-/* ==========================
-   RESET
-========================== */
-
 *{
     margin:0;
     padding:0;
@@ -10,445 +6,288 @@
 }
 
 body{
-    background:#F8F8F8;
+    background:#FCE8D9;
 }
 
-/* ==========================
-   NAVBAR
-========================== */
+/* Navbar */
 
 .navbar{
-
     width:100%;
     height:80px;
-
     display:flex;
     justify-content:space-between;
     align-items:center;
-
     padding:0 40px;
-
-    background:white;
-
+    background:#FCE8D9;
     box-shadow:0 2px 8px rgba(0,0,0,.08);
-
     position:sticky;
     top:0;
     z-index:1000;
-
 }
 
 .logo img{
-
     width:55px;
-
 }
 
 .nav-links{
-
     display:flex;
     gap:35px;
-
 }
 
 .nav-links a{
-
     text-decoration:none;
-    color:#222;
+    color:#31112C;
     font-size:17px;
     font-weight:500;
-
 }
 
 .nav-links a:hover{
-
-    color:#008C45;
-
+    color:#7D0633;
 }
 
-/* ==========================
-SEARCH
-========================== */
+/* Search */
 
 .search-bar{
-
-    width:350px;
+    width:450px;
     height:45px;
-
     display:flex;
     align-items:center;
-
-    background:#f2f2f2;
-
+    background:#FCE8D9;
+    border:1.25px solid #31112C;
     border-radius:30px;
-
     padding:0 15px;
+}
 
+.search-bar:hover{
+    background:#ffefe4;
 }
 
 .search-bar img{
-
     width:18px;
     margin-right:10px;
-
 }
 
 .search-bar input{
-
     border:none;
     outline:none;
-
     background:transparent;
-
     width:100%;
-
     font-size:15px;
-
 }
 
-/* ==========================
-LOGIN
-========================== */
+/* Login */
 
 .account-section{
-
     display:flex;
     align-items:center;
     gap:15px;
-
     position:relative;
-
 }
 
 #loginBtn{
-
-    background:#008C45;
-
-    color:white;
-
+    background:#7D0633;
+    color:#FCE8D9;
     border:none;
-
     padding:12px 28px;
-
     border-radius:30px;
-
     cursor:pointer;
-
     font-size:15px;
-
     transition:.3s;
-
 }
 
 #loginBtn:hover{
-
-    background:#006f36;
-
+    background:#31112C;
 }
 
 .dropdown-btn{
-
     background:none;
     border:none;
     cursor:pointer;
-
 }
 
 .dropdown-btn img{
-
     width:18px;
-
 }
 
-/* ==========================
-DROPDOWN
-========================== */
+/* Dropdown */
 
 .dropdown-menu{
-
     position:absolute;
-
     right:0;
     top:65px;
-
     width:180px;
-
-    background:white;
-
+    background:#7D0633;
     border-radius:10px;
-
     box-shadow:0 5px 15px rgba(0,0,0,.15);
-
     display:none;
-
     overflow:hidden;
-
 }
 
 .dropdown-item{
-
     padding:15px;
-
     cursor:pointer;
-
+    color: #FCE8D9;
 }
 
 .dropdown-item:hover{
-
-    background:#f4f4f4;
-
+    background:#31112C;
 }
 
-/* ==========================
-MAIN
-========================== */
+/* Main */
 
 .container{
-
     display:flex;
-
     padding:30px;
-
 }
 
-/* ==========================
-SIDEBAR
-========================== */
+/* Sidebar */
 
 .sidebar{
-
+    position:fixed;
+    top:80px;
+    left:0;
     width:220px;
-
+    height:calc(100vh - 80px);
+    background:#FCE8D9;
     display:flex;
     flex-direction:column;
-
     gap:18px;
-
+    padding:25px 15px;
 }
 
 .sidebar a{
-
     display:flex;
     align-items:center;
-
     gap:12px;
-
     text-decoration:none;
-
-    color:#444;
-
+    color:#31112C;
     padding:12px;
-
     border-radius:10px;
-
     transition:.3s;
-
 }
 
 .sidebar a img{
-
     width:22px;
-
 }
 
 .sidebar a:hover{
-
-    background:white;
-
+    background:#ffefe4;
+    color:#31112C;
 }
 
 .settings{
-
-    margin-top:40px;
-
+    margin-top:140px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-/* ==========================
-GRID
-========================== */
+/* Grid */
 
 .recipes-grid{
-
     flex:1;
-
     display:grid;
-
     grid-template-columns:repeat(4,1fr);
-
     gap:25px;
-
-    margin-left:35px;
-
+    margin-left:240px;
 }
 
-/* ==========================
-CARD
-========================== */
+/* Card */
 
 .recipe-card{
-
-    background:white;
-
+    background:#ffefe4;
     border-radius:15px;
-
     overflow:hidden;
-
     box-shadow:0 5px 12px rgba(0,0,0,.08);
-
     transition:.3s;
-
 }
 
 .recipe-card:hover{
-
     transform:translateY(-6px);
-
 }
 
 .recipe-image{
-
     width:100%;
-
     height:180px;
-
     object-fit:cover;
-
 }
 
 .recipe-content{
-
     padding:15px;
-
 }
 
 .recipe-title{
-
-    font-size:20px;
-
+    font-size:16px;
     font-weight:bold;
-
     margin-bottom:10px;
-
 }
 
 .recipe-author{
-
     color:#777;
-
-    font-size:14px;
-
+    font-size:12px;
     margin-bottom:10px;
-
 }
 
 .recipe-footer{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
 }
 
 .time{
-
-    color:#008C45;
-
+    color:#7D0633;
     font-weight:bold;
-
 }
 
 .heart{
-
+    width:24px;
+    height:24px;
     cursor:pointer;
-
-    font-size:20px;
-
-    color:#bbb;
-
-    transition:.3s;
-
+    transition:transform .2s;
 }
 
-.heart.active{
-
-    color:red;
-
+.heart:hover{
+    transform:scale(1.15);
 }
 
-/* ==========================
-RESPONSIVE
-========================== */
+/* Responsive */
 
 @media(max-width:1200px){
-
-.recipes-grid{
-
-grid-template-columns:repeat(3,1fr);
-
-}
-
+    .recipes-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
 }
 
 @media(max-width:900px){
-
-.container{
-
-flex-direction:column;
-
-}
-
-.sidebar{
-
-width:100%;
-flex-direction:row;
-margin-bottom:25px;
-
-}
-
-.recipes-grid{
-
-margin-left:0;
-
-grid-template-columns:repeat(2,1fr);
-
-}
-
+    .container{
+        flex-direction:column;
+    }
+    .sidebar{
+        width:100%;
+        flex-direction:row;
+        margin-bottom:25px;
+    }
+    .recipes-grid{
+        margin-left:0;
+        grid-template-columns:repeat(2,1fr);
+    }
 }
 
 @media(max-width:600px){
-
-.navbar{
-
-flex-direction:column;
-
-height:auto;
-
-padding:20px;
-
-gap:20px;
-
-}
-
-.nav-links{
-
-flex-wrap:wrap;
-
-justify-content:center;
-
-}
-
-.search-bar{
-
-width:100%;
-
-}
-
-.recipes-grid{
-
-grid-template-columns:1fr;
-
-}
-
+    .navbar{
+        flex-direction:column;
+        height:auto;
+        padding:20px;
+        gap:20px;
+    }
+    .nav-links{
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+    .search-bar{
+        width:100%;
+    }
+    .recipes-grid{
+        grid-template-columns:1fr;
+    }
 }
