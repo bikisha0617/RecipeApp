@@ -11,7 +11,6 @@
 <body>
 
     <!-- Navbar -->
-
     <header class="navbar">
         <div class="logo">
             <img src="images/logo.png" alt="Logo">
@@ -25,68 +24,69 @@
         </nav>
 
         <div class="search-bar">
-            <img src="images/icons/search.png" alt="">
-            <input
-                type="text"
-                placeholder="Search recipes"
-                id="searchInput"
-            >
+            <img src="images/icons/search.png" alt="Search">
+            <input type="text" placeholder="Search recipes" id="searchInput">
         </div>
 
         <div class="account-section">
-            <button id="loginBtn">
-                Login
-            </button>
 
-            <button id="dropdownBtn" class="dropdown-btn">
-                <img src="images/icons/dropdown.png" alt="">
-            </button>
+            <!-- Guest -->
+            <button id="loginBtn">Login</button>
 
+            <!-- Logged In -->
+            <div id="profileSection" class="profile-section">
+                <img src="images/icons/profile.png" class="profile-pic" alt="Profile">
+                <button id="dropdownBtn" class="dropdown-btn">
+                    <img src="images/icons/dropdown.png" alt="Dropdown">
+                </button>
+            </div>
+
+            <!-- Dropdown -->
             <div id="dropdownMenu" class="dropdown-menu">
-                <div class="dropdown-item login-item">
-                    Login
+                <div class="dropdown-user">
+                    <img src="images/icons/profile.png" class="dropdown-profile" alt="Profile">
+                    <div>
+                        <h4>Bikisha Maharjan</h4>
+                        <small>bikisha@gmail.com</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="dropdown-item" id="switchAccount">
+                    Add another account
                 </div>
             </div>
         </div>
     </header>
 
     <!-- Main -->
-
     <main class="container">
 
         <!-- Sidebar -->
-
         <aside class="sidebar">
             <a href="#">
-                <img src="images/icons/recipe.png">
-                Recipes
+                <img src="images/icons/recipe.png" alt="Recipes">Recipes
             </a>
 
             <a href="#">
-                <img src="images/icons/favourite.png">
-                Favourites
+                <img src="images/icons/favourite.png" alt="Favourites">Favourites
             </a>
 
             <a href="#">
-                <img src="images/icons/healthy.png">
-                Healthy
+                <img src="images/icons/healthy.png" alt="Healthy">Healthy
             </a>
 
             <a href="#">
-                <img src="images/icons/dessert.png">
-                Dessert
+                <img src="images/icons/dessert.png" alt="Dessert">Dessert
             </a>
 
             <div class="settings">
                 <a href="settings.html">
-                    <img src="images/icons/settings.png">
+                    <img src="images/icons/settings.png" alt="Settings">
                 </a>
             </div>
-
         </aside>
 
         <!-- Recipes -->
-
         <section class="recipes-grid" id="recipeContainer">
         </section>
     </main>

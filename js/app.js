@@ -71,29 +71,30 @@ function toggleFavourite(id, heart){
 
 /* Login */
 
-loginBtn.addEventListener("click",()=>{
-    window.location="login.html";
-});
+const profileSection = document.getElementById("profileSection");
 
-/* Dropdown */
+if(localStorage.getItem("loggedIn") === "true"){
+    loginBtn.style.display = "none";
+    profileSection.style.display = "flex";
+}else{
+    loginBtn.style.display = "block";
+    profileSection.style.display = "none";
+}
 
-dropdownBtn.addEventListener("click",(e)=>{
+loginBtn.onclick = () => {
+    window.location = "login.html";
+};
+
+dropdownBtn.onclick = (e) => {
     e.stopPropagation();
-    if(dropdownMenu.style.display==="block"){
-        dropdownMenu.style.display="none";
-    }else{
-        dropdownMenu.style.display="block";
-    }
-});
+    dropdownMenu.classList.toggle("show");
+};
 
-/* Hide Dropdown */
+window.onclick = () => {
+    dropdownMenu.classList.remove("show");
+};
 
-window.addEventListener("click",()=>{
-    dropdownMenu.style.display="none";
-});
-
-/* Login Option */
-
-document.querySelector(".login-item").addEventListener("click",()=>{
-    window.location="login.html";
-});
+document.getElementById("switchAccount").onclick = () => {
+    localStorage.removeItem("loggedIn");
+    window.location = "login.html";
+};

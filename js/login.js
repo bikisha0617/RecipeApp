@@ -11,5 +11,5 @@ form.addEventListener("submit", function(e){
 
     localStorage.setItem("loggedIn","true");
     localStorage.setItem("userName","Bikisha Maharjan");
-    window.location.href="index.html";
+    window.location="index.html";
 });
