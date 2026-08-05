@@ -1,0 +1,253 @@
+.create-page{
+    width:100%;
+    margin-left:190px;
+    padding:15px 50px 50px;
+    margin-top: 2px;
+}
+
+.create-page h1{
+    color:#31112C;
+    margin-bottom:30px;
+    margin-top: 1px;
+}
+
+/* Form */
+
+#recipeForm{
+    background:#ffefe4;
+    padding:35px;
+    border-radius:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    padding-top: 12px;
+}
+
+label{
+    display:block;
+    margin-top:20px;
+    margin-bottom:8px;
+    font-weight:bold;
+    color:#31112C;
+    font-size: 16px;
+}
+
+#recipeForm input,#recipeForm textarea,#recipeForm select{
+    width:100%;
+    padding:14px;
+    border:1px solid #d8b8a5;
+    border-radius:10px;
+    background:white;
+    font-size:15px;
+    outline:none;
+}
+
+#recipeForm input:focus,#recipeForm textarea:focus,#recipeForm select:focus{
+    border:1px solid #7D0633;
+}
+
+#recipeForm input::placeholder,#recipeForm textarea::placeholder,#recipeForm select::placeholder{
+    font-size: 14px;
+}
+
+textarea{
+    resize:vertical;
+    min-height:120px;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-top:10px;
+}
+
+/* .nutrition-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    margin-top:10px;
+} */
+
+.nutrition-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-top:10px;
+}
+
+.nutrition-grid p{
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* Image */
+
+.image-upload{
+    margin-top:10px;
+}
+
+.upload-box{
+    position:relative;
+    display:block;
+    width:850px;
+    height:250px;
+    border:1.5px dashed #7D0633;
+    border-radius:18px;
+    overflow:hidden;
+    cursor:pointer;
+    background:#ffede0;
+}
+
+#preview{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+.upload-overlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:#ffede0;
+    color:#7D0633;
+    transition:.3s;
+}
+
+.upload-box:hover .upload-overlay{
+    background:#FBDCC4;
+}
+
+.upload-icon{
+    width:42px;
+    margin-bottom:15px;
+}
+
+.upload-overlay p{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+/* Ingredients */
+
+#ingredientList input{
+    margin-bottom:10px;
+}
+
+/* Instructions */
+
+#stepList textarea{
+    margin-bottom:12px;
+    min-height:80px;
+}
+
+/* Buttons */
+
+.add-btn{
+    margin-top:1px;
+    margin-bottom: 10px;
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#7D0633;
+    color:#FCE8D9;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.add-btn:hover{
+    background:#31112C;
+}
+
+.buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+    margin-top:40px;
+}
+
+.cancel-btn{
+    padding:12px 25px;
+    border:none;
+    border-radius:8px;
+    background:#FBDCC4;
+    color:#7D0633;
+    cursor:pointer;
+}
+
+.cancel-btn:hover{
+    background:#F2A07B;
+}
+
+.publish-btn{
+    padding:12px 30px;
+    border:none;
+    border-radius:8px;
+    background:#7D0633;
+    color:#FCE8D9;
+    cursor:pointer;
+}
+
+.publish-btn:hover{
+    background:#31112C;
+}
+
+.ingredient-row,.step-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:12px;
+}
+
+.ingredient-row input,.step-row textarea{
+    flex:1;
+}
+
+.remove-btn{
+    width:40px;
+    height:40px;
+    border:none;
+    background:#7D0633;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.remove-btn:hover{
+    background:#31112C;
+}
+
+/* Responsive */
+
+@media(max-width:1000px){
+    .create-page{
+        margin-left:0;
+        padding:20px;
+    }
+
+    .row{
+        grid-template-columns:1fr;
+    }
+
+    #preview{
+        width:100%;
+        height:250px;
+    }
+
+    .buttons{
+        flex-direction:column;
+    }
+
+    .publish-btn,.cancel-btn{
+        width:100%;
+    }
+}
+
+@media(max-width:1000px){
+    .nutrition-grid{
+        grid-template-columns:1fr;
+    }
+}

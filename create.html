@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Recipe</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/create.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">
+        <img src="images/logo.png" alt="Logo">
+    </div>
+
+    <nav class="nav-links">
+        <a href="index.html">Explore</a>
+        <a href="#">My Recipes</a>
+        <a href="categories.html">Categories</a>
+        <a href="create.html">Create</a>
+    </nav>
+
+    <div class="search-bar">
+        <img src="images/icons/search.png" alt="">
+        <input type="text" placeholder="Search recipes">
+    </div>
+
+    <div class="account-section">
+        <div class="profile-section" style="display:flex;">
+            <img src="images/icons/profile.png" class="profile-pic">
+            <button class="dropdown-btn">
+                <img src="images/icons/dropdown.png">
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="index.html">
+            <img src="images/icons/recipe.png">Recipes
+        </a>
+
+        <a href="#">
+            <img src="images/icons/favourite.png">Favourites
+        </a>
+
+        <a href="#">
+            <img src="images/icons/healthy.png">Healthy
+        </a>
+
+        <a href="#">
+            <img src="images/icons/dessert.png">Dessert
+        </a>
+
+        <div class="settings">
+            <a href="settings.html">
+                <img src="images/icons/settings.png">
+            </a>
+        </div>
+    </aside>
+
+    <!-- Form -->
+    <main class="create-page">
+        <h1>Create Recipe</h1>
+        <form id="recipeForm">
+
+            <label>Recipe Image</label>
+            <div class="image-upload">
+                <input type="file" id="imageInput" accept="image/*" hidden>
+                <label for="imageInput" class="upload-box">
+                    <img src="images/placeholder.jpg" id="preview">
+                    <div class="upload-overlay">
+                        <img src="images/icons/image-upload.png" class="upload-icon">
+                        <p>Click to upload image of your recipe</p>
+                    </div>
+                </label>
+            </div>
+
+            <label>Recipe Title</label>
+            <input type="text" id="title" placeholder="Enter your recipe title">
+
+            <label>Description</label>
+            <textarea id="description" rows="4" placeholder="Describe your recipe"></textarea>
+            <div class="row">
+                <div>
+                    <label>Category</label>
+                    <select id="category">
+                        <option>Breakfast</option>
+                        <option>Lunch</option>
+                        <option>Dinner</option>
+                        <option>Dessert</option>
+                        <option>Healthy</option>
+                        <option>Snacks</option>
+                        <option>Drinks</option>
+                        <option>Vegan</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Cooking Time (minutes)</label>
+                    <input type="number" id="time" min="0" value="5">
+                </div>
+                <div>
+                    <label>Servings</label>
+                    <input type="number" id="servings" min="1" value="2">
+                </div>
+                <div>
+                    <label>Difficulty</label>
+                    <select id="difficulty">
+                        <option>Easy</option>
+                        <option>Medium</option>
+                        <option>Hard</option>
+                    </select>
+                </div>
+            </div>
+
+            <label>Nutrition (Per Serving)</label>
+            <div class="nutrition-grid">
+                <div>
+                    <p>Calories (kcal)</p>
+                    <input type="number" id="calories" min="0" value="1">
+                </div>
+
+                <div>
+                    <p>Protein (g)</p>
+                    <input type="number" id="protein" min="0" value="1">
+                </div>
+
+                <div>
+                    <p>Carbohydrates (g)</p>
+                    <input type="number" id="carbs" min="0" value="1">
+                </div>
+
+                <div>
+                    <p>Fat (g)</p>
+                    <input type="number" id="fat" min="0" value="1">
+                </div>
+
+            </div>
+
+            <label>Ingredients</label>
+            <div id="ingredientList">
+                <div class="ingredient-row">
+                    <input type="text" class="ingredient" placeholder="Ingredient">
+                </div>
+            </div>
+
+            <button type="button" id="addIngredient" class="add-btn">
+                + Add Ingredient
+            </button>
+
+            <label>Instructions</label>
+            <div id="stepList">
+                <textarea class="step" placeholder="Step 1"></textarea>
+            </div>
+
+            <button type="button" id="addStep" class="add-btn">
+                + Add Step
+            </button>
+
+            <div class="buttons">
+                <button type="reset" class="cancel-btn">
+                    Cancel
+                </button>
+
+                <button type="submit" class="publish-btn">
+                    Publish
+                </button>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script src="js/create.js"></script>
+
+</body>
+</html>

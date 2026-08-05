@@ -27,6 +27,10 @@
     align-items:center;
 }
 
+strong{
+    font-size: 17px;
+}
+
 .details{
     display:flex;
     gap:80px;
