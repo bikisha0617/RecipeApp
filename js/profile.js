@@ -5,8 +5,8 @@ const savedGrid = document.getElementById("savedGrid");
 const userRecipes = JSON.parse(localStorage.getItem("userRecipes")) || [];
 
 // User Information
-profileName.textContent = localStorage.getItem("userName") || "Guest User";
-profileEmail.textContent = localStorage.getItem("userEmail") || "guest@email.com";
+profileName.textContent = localStorage.getItem("userName") || "Bikisha Maharjan";
+profileEmail.textContent = localStorage.getItem("userEmail") || "bikisha@email.com";
 
 // Statistics
 document.getElementById("recipeCount").textContent = userRecipes.length;
