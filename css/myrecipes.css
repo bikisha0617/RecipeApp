@@ -85,6 +85,8 @@
     margin-top:80px;
 }
 
+/* Responsive */
+
 @media(max-width:900px){
     .recipe-grid{
         grid-template-columns:1fr;

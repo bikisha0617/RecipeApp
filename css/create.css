@@ -60,13 +60,6 @@ textarea{
     margin-top:10px;
 }
 
-/* .nutrition-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:20px;
-    margin-top:10px;
-} */
-
 .nutrition-grid{
     display:grid;
     grid-template-columns:repeat(4,1fr);
