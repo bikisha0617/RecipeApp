@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">
+        <img src="images/logo.png">
+    </div>
+
+    <nav class="nav-links">
+        <a href="index.html">Explore</a>
+        <a href="myrecipes.html">My Recipes</a>
+        <a href="categories.html">Categories</a>
+        <a href="create.html">Create</a>
+    </nav>
+
+    <div class="search-bar">
+        <img src="images/icons/search.png">
+        <input type="text" placeholder="Search recipes">
+    </div>
+
+    <div class="account-section">
+        <div class="profile-section" style="display:flex;">
+            <img src="images/icons/profile.png" class="profile-pic">
+            <button class="dropdown-btn">
+                <img src="images/icons/dropdown.png">
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="index.html">
+            <img src="images/icons/recipe.png">Recipes
+        </a>
+
+        <a href="myrecipes.html">
+            <img src="images/icons/favourite.png">My Recipes
+        </a>
+
+        <a href="categories.html">
+            <img src="images/icons/healthy.png">Categories
+        </a>
+
+        <a href="create.html">
+            <img src="images/icons/dessert.png">Create
+        </a>
+
+        <div class="settings">
+            <a href="settings.html">
+                <img src="images/icons/settings.png">
+            </a>
+        </div>
+    </aside>
+
+    <!-- Settings -->
+    <main class="settings-page">
+        <h1>Account Settings</h1>
+        <div class="settings-card">
+            <div class="profile-section-settings">
+                <img src="images/icons/profile.png" class="profile-image">
+                <button id="changePhoto">Change Photo</button>
+            </div>
+
+            <label>Full Name</label>
+            <input type="text" id="name" value="Bikisha Maharjan">
+
+            <label>Email</label>
+            <input type="email" id="email" value="bikisha@gmail.com">
+
+            <label>Change Password</label>
+            <input type="password" id="password" placeholder="New password">
+
+            <div class="toggle-row">
+                <span>Notifications</span>
+                <input type="checkbox" id="notifications">
+            </div>
+
+            <div class="toggle-row">
+                <span>Dark Mode</span>
+                <input type="checkbox" id="darkMode">
+            </div>
+
+            <div class="button-row">
+                <button id="saveBtn">Save Changes</button>
+                <button id="deleteBtn">Delete Account</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-box">
+        <h2>Delete Account?</h2>
+        <p>This action cannot be undone.</p>
+        <div class="modal-buttons">
+            <button id="cancelDelete">Cancel</button>
+            <button id="confirmDelete">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/settings.js"></script>
+
+</body>
+</html>
