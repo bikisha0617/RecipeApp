@@ -1,6 +1,8 @@
 const params = new URLSearchParams(window.location.search);
 const recipeId = Number(params.get("id"));
-const recipe = recipes.find(r => r.id === recipeId);
+const userRecipes = JSON.parse(localStorage.getItem("userRecipes")) || [];
+const allRecipes = [...recipes, ...userRecipes];
+const recipe = allRecipes.find(r => r.id === recipeId);
 
 if(recipe){
     document.getElementById("recipeImage").src = recipe.image;

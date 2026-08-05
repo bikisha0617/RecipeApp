@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recipes</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/myrecipes.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">
+        <img src="images/logo.png" alt="Logo">
+    </div>
+
+    <nav class="nav-links">
+        <a href="index.html">Explore</a>
+        <a href="myrecipes.html">My Recipes</a>
+        <a href="categories.html">Categories</a>
+        <a href="create.html">Create</a>
+    </nav>
+
+    <div class="search-bar">
+        <img src="images/icons/search.png">
+        <input type="text" placeholder="Search my recipes" id="searchRecipe">
+    </div>
+
+    <div class="account-section">
+        <div class="profile-section" style="display:flex;">
+            <img src="images/icons/profile.png" class="profile-pic">
+            <button class="dropdown-btn">
+                <img src="images/icons/dropdown.png">
+            </button>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="index.html">
+            <img src="images/icons/recipe.png">Recipes
+        </a>
+
+        <a href="#">
+            <img src="images/icons/favourite.png">Favourites
+        </a>
+
+        <a href="#">
+            <img src="images/icons/healthy.png">Healthy
+        </a>
+
+        <a href="#">
+            <img src="images/icons/dessert.png">Dessert
+        </a>
+
+        <div class="settings">
+            <a href="settings.html">
+                <img src="images/icons/settings.png">
+            </a>
+        </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="my-recipes">
+        <div class="page-header">
+            <h1>My Recipes</h1>
+            <a href="create.html" class="new-btn">
+                + New Recipe
+            </a>
+        </div>
+        <div id="myRecipeGrid" class="recipe-grid">
+        </div>
+    </main>
+</div>
+
+<script src="js/myrecipes.js"></script>
+
+</body>
+</html>
