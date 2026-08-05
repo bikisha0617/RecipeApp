@@ -41,7 +41,7 @@ if(recipe){
     if(recipe.nutrition){
         const nutrition = recipe.nutrition;
         nutritionList.innerHTML += `
-            <li>Calories: ${nutrition.calories || "-"}</li>
+            <li>Calories: ${nutrition.calories || "-"} kcal</li>
             <li>Protein: ${nutrition.protein || "-"} g</li>
             <li>Carbs: ${nutrition.carbs || "-"} g</li>
             <li>Fat: ${nutrition.fat || "-"} g</li>

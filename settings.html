@@ -28,13 +28,32 @@
     </div>
 
     <div class="account-section">
-        <div class="profile-section" style="display:flex;">
-            <a href="profile.html"><img src="images/icons/profile.png" class="profile-pic" alt="Profile"></a>
-            <button class="dropdown-btn">
-                <img src="images/icons/dropdown.png">
-            </button>
-        </div>
-    </div>
+
+            <!-- Guest -->
+            <button id="loginBtn">Login</button>
+
+            <!-- Logged In -->
+            <div id="profileSection" class="profile-section">
+                <a href="profile.html"><img src="images/icons/profile.png" class="profile-pic" alt="Profile"></a>
+                <button id="dropdownBtn" class="dropdown-btn">
+                    <img src="images/icons/dropdown.png" alt="Dropdown">
+                </button>
+            </div>
+
+            <!-- Dropdown -->
+            <div id="dropdownMenu" class="dropdown-menu">
+                <div class="dropdown-user">
+                    <img src="images/icons/profile.png" class="dropdown-profile" alt="Profile">
+                    <div>
+                        <h4>Bikisha Maharjan</h4>
+                        <small>bikisha@gmail.com</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="dropdown-item" id="switchAccount">
+                    Add another account
+                </div>
+            </div>
 </header>
 
 <div class="container">
@@ -113,6 +132,6 @@
 </div>
 
 <script src="js/settings.js"></script>
-
+<script src="js/navbar.js"></script>
 </body>
 </html>

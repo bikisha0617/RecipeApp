@@ -23,12 +23,12 @@ const recipes = [
         "Spread avocado on the toast.",
         "Top with eggs and chilli flakes."
     ],
-    nutrition:[
-        "Calories: 300",
-        "Protein: 15g",
-        "Carbohydrates: 25g",
-        "Fat: 15g"
-    ]
+    nutrition:{
+        calories: 300,
+        protein: 15,
+        carbs: 25,
+        fat: 15
+    }
 },   
 
 {
@@ -59,12 +59,12 @@ const recipes = [
         "Mix in cooked vegetables and pasta.",
         "Serve hot."
     ],
-    nutrition:[
-        "Calories: 400",
-        "Protein: 12g",
-        "Carbohydrates: 50g",
-        "Fat: 18g"
-    ]
+    nutrition:{
+        calories: 400,
+        protein: 12,
+        carbs: 50,
+        fat: 18
+    }
 },
 
 {
@@ -93,12 +93,12 @@ const recipes = [
         "Season with salt and black pepper.",
         "Fold the tortilla and cut in half."
     ],
-    nutrition:[
-        "Calories: 250",
-        "Protein: 8g",
-        "Carbohydrates: 35g",
-        "Fat: 10g"
-    ]
+    nutrition:{
+        calories: 250,
+        protein: 8,
+        carbs: 35,
+        fat: 10
+    }
 },
 
 {
@@ -129,12 +129,12 @@ const recipes = [
         "Cook for 30 minutes.",
         "Serve hot with rice."
     ],
-    nutrition:[
-        "Calories: 350",
-        "Protein: 30g",
-        "Carbohydrates: 10g",
-        "Fat: 20g"
-    ]
+    nutrition:{
+        calories: 350,
+        protein: 30,
+        carbs: 10,
+        fat: 20
+    }
 },
 
 {
@@ -168,12 +168,12 @@ const recipes = [
         "Cook until golden brown on both sides.",
         "Serve with maple syrup or honey."
     ],
-    nutrition:[
-        "Calories: 350",
-        "Protein: 8g",
-        "Carbohydrates: 60g",
-        "Fat: 10g"
-    ]
+    nutrition:{
+        calories: 350,
+        protein: 8,
+        carbs: 60,
+        fat: 10
+    }
 },
 
 {
@@ -203,12 +203,12 @@ const recipes = [
         "Add cooked rice and mix well.",
         "Garnish with spring onions and drizzle with sesame oil."
     ],
-    nutrition:[
-        "Calories: 300",
-        "Protein: 6g",
-        "Carbohydrates: 55g",
-        "Fat: 8g"
-    ]
+    nutrition:{
+        calories: 300,
+        protein: 6,
+        carbs: 55,
+        fat: 8
+    }
 },
 
 {
@@ -234,12 +234,12 @@ const recipes = [
         "Pour the dressing over the fruits and toss to coat.",
         "Chill for at least 30 minutes before serving."
     ],
-    nutrition:[
-        "Calories: 150",
-        "Protein: 1g",
-        "Carbohydrates: 35g",
-        "Fat: 5g"
-    ]
+    nutrition:{
+        calories: 150,
+        protein: 1,
+        carbs: 35,
+        fat: 5
+    }
 },
 
 {
@@ -269,12 +269,12 @@ const recipes = [
         "Add stir-fry noodles and mix well.",
         "Garnish with chilli flakes."
     ],
-    nutrition:[
-        "Calories: 350",
-        "Protein: 10g",
-        "Carbohydrates: 50g",
-        "Fat: 18g"
-    ]
+    nutrition:{
+        calories: 350,
+        protein: 10,
+        carbs: 50,
+        fat: 18
+    }
 },
 
 {
@@ -301,12 +301,12 @@ const recipes = [
         "Microwave for 1-2 minutes until set.",
         "Let cool for a few minutes before serving."
     ],
-    nutrition:[
-        "Calories: 300",
-        "Protein: 5g",
-        "Carbohydrates: 45g",
-        "Fat: 12g"
-    ]
+    nutrition:{
+        calories: 300,
+        protein: 5,
+        carbs: 45,
+        fat: 12
+    }
 },
 
 {
@@ -336,12 +336,12 @@ const recipes = [
         "Add paneer cubes and cream.",
         "Simmer for 10-15 minutes until the curry thickens."
     ],
-    nutrition:[
-        "Calories: 350",
-        "Protein: 25g",
-        "Carbohydrates: 10g",
-        "Fat: 20g"
-    ]
+    nutrition:{
+        calories: 350,
+        protein: 25,
+        carbs: 10,
+        fat: 20
+    }
 },
 
 {
@@ -369,12 +369,12 @@ const recipes = [
         "Toss to coat evenly.",
         "Season with salt and black pepper to taste."
     ],
-    nutrition:[
-        "Calories: 350",
-        "Protein: 25g",
-        "Carbohydrates: 10g",
-        "Fat: 20g"
-    ]
+    nutrition:{
+        calories: 350,
+        protein: 25,
+        carbs: 10,
+        fat: 20
+    }
 },
 
 {
@@ -401,11 +401,11 @@ const recipes = [
         "Pour in the egg mixture and cook until set.",
         "Fold the omelette in half and serve."
     ],
-    nutrition:[
-        "Calories: 150",
-        "Protein: 12g",
-        "Carbohydrates: 3g",
-        "Fat: 10g"
-    ]
+    nutrition:{
+        calories: 150,
+        protein: 12,
+        carbs: 3,
+        fat: 10
+    }
 }
 ];
