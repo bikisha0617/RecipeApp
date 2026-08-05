@@ -10,12 +10,8 @@ function displayRecipes(recipeList){
     recipeContainer.innerHTML = "";
     recipeList.forEach(recipe=>{
         recipeContainer.innerHTML += `
-        <div class="recipe-card">
-            <img
-                src="${recipe.image}"
-                class="recipe-image"
-                alt="${recipe.title}"
-            >
+        <a href="recipe.html?id=${recipe.id}" class="recipe-card">
+            <img src="${recipe.image}" class="recipe-image" alt="${recipe.title}">
             <div class="recipe-content">
                 <h3 class="recipe-title">
                     ${recipe.title}
@@ -27,19 +23,10 @@ function displayRecipes(recipeList){
                     <span class="time">
                         ${recipe.time}
                     </span>
-                    <img
-                        src="${
-                            recipe.favourite
-                            ? 'images/icons/images/icons/HeartFilled.png'
-                            : 'images/icons/HeartUnfilled.png'
-                        }"
-                        class="heart"
-                        onclick="toggleFavourite(${recipe.id}, this)"
-                        alt="Favourite"
-                    >
+                    <img src="${recipe.favourite ? 'images/icons/HeartFilled.png' : 'images/icons/HeartUnfilled.png'}" class="heart" onclick="toggleFavourite(${recipe.id}, this)" alt="Favourite">
                 </div>
             </div>
-        </div>
+        </a>
         `;
     });
 }

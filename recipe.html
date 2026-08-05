@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Details</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/recipe.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+    <div class="logo">
+        <img src="images/logo.png">
+    </div>
+
+    <nav class="nav-links">
+        <a href="index.html">Explore</a>
+        <a href="#">My Recipes</a>
+        <a href="categories.html">Categories</a>
+        <a href="create.html">Create</a>
+    </nav>
+
+    <div class="search-bar">
+        <img src="images/icons/search.png">
+        <input type="text" placeholder="Search recipes">
+    </div>
+</header>
+
+<main class="recipe-page">
+    <img id="recipeImage" class="hero-image">
+    <div class="recipe-info">
+        <div class="title-row">
+            <h1 id="recipeTitle"></h1>
+            <img src="images/icons/HeartUnfilled.png" id="heart" class="heart">
+        </div>
+        <p class="author" id="recipeAuthor"></p>
+        <div class="details">
+            <div>
+                <strong>Time</strong>
+                <p id="recipeTime"></p>
+            </div>
+
+            <div>
+                <strong>Servings</strong>
+                <p id="recipeServings"></p>
+            </div>
+        </div>
+        <h2>Description</h2>
+        <p id="recipeDescription"></p>
+        <h2>Ingredients</h2>
+        <ul id="ingredientsList"></ul>
+        <h2>Instructions</h2>
+        <ol id="instructionsList"></ol>
+        <h2>Nutrition (Per Serving)</h2>
+        <ul id="nutritionList"></ul>
+    </div>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/recipe.js"></script>
+
+</body>
+</html>
