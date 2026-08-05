@@ -10,8 +10,9 @@ profileEmail.textContent = localStorage.getItem("userEmail") || "guest@email.com
 
 // Statistics
 document.getElementById("recipeCount").textContent = userRecipes.length;
+const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
 const favouriteRecipes = recipes.filter(function(recipe){
-    return recipe.favourite;
+    return favourites.includes(recipe.id);
 });
 document.getElementById("favCount").textContent = favouriteRecipes.length;
 

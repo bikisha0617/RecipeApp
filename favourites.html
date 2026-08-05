@@ -3,30 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Recipes</title>
+    <title>Favourites</title>
     <link rel="stylesheet" href="css/home.css">
-    <link rel="stylesheet" href="css/myrecipes.css">
+    <link rel="stylesheet" href="css/favourites.css">
 </head>
 <body>
 
-<!-- Navbar -->
 <header class="navbar">
     <div class="logo">
         <img src="images/logo.png" alt="Logo">
     </div>
-
     <nav class="nav-links">
         <a href="index.html">Explore</a>
         <a href="myrecipes.html">My Recipes</a>
         <a href="categories.html">Categories</a>
         <a href="create.html">Create</a>
     </nav>
-
     <div class="search-bar">
         <img src="images/icons/search.png">
-        <input type="text" placeholder="Search my recipes" id="searchRecipe">
+        <input type="text" placeholder="Search favourites" id="searchFavourite">
     </div>
-
     <div class="account-section">
         <div class="profile-section" style="display:flex;">
             <a href="profile.html"><img src="images/icons/profile.png" class="profile-pic" alt="Profile"></a>
@@ -35,11 +31,9 @@
             </button>
         </div>
     </div>
+
 </header>
-
 <div class="container">
-
-    <!-- Sidebar -->
     <aside class="sidebar">
         <a href="index.html">
             <img src="images/icons/recipe.png">Recipes
@@ -50,11 +44,11 @@
         </a>
 
         <a href="categories.html">
-            <img src="images/icons/healthy.png">Healthy
+            <img src="images/icons/healthy.png">Categories
         </a>
 
-        <a href="categories.html">
-            <img src="images/icons/dessert.png">Dessert
+        <a href="create.html">
+            <img src="images/icons/dessert.png">Create
         </a>
 
         <div class="settings">
@@ -64,20 +58,13 @@
         </div>
     </aside>
 
-    <!-- Content -->
-    <main class="my-recipes">
-        <div class="page-header">
-            <h1>My Recipes</h1>
-            <a href="create.html" class="new-btn">
-                + New Recipe
-            </a>
-        </div>
-        <div id="myRecipeGrid" class="recipe-grid">
-        </div>
+    <main class="favourites-page">
+        <h1>Favourites</h1>
+        <div id="favouriteGrid" class="recipe-grid"></div>
     </main>
 </div>
 
-<script src="js/myrecipes.js"></script>
-
+<script src="js/data.js"></script>
+<script src="js/favourites.js"></script>
 </body>
 </html>

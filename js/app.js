@@ -4,14 +4,19 @@ const dropdownBtn = document.getElementById("dropdownBtn");
 const dropdownMenu = document.getElementById("dropdownMenu");
 const loginBtn = document.getElementById("loginBtn");
 
+let favourites = JSON.parse(localStorage.getItem("favourites")) || [];
+
 /* Recipes */
 
 function displayRecipes(recipeList){
     recipeContainer.innerHTML = "";
-    recipeList.forEach(recipe=>{
+    recipeList.forEach(function(recipe){
+        const isFavourite = favourites.includes(recipe.id);
         recipeContainer.innerHTML += `
-        <a href="recipe.html?id=${recipe.id}" class="recipe-card">
-            <img src="${recipe.image}" class="recipe-image" alt="${recipe.title}">
+        <div class="recipe-card">
+            <a href="recipe.html?id=${recipe.id}">
+                <img src="${recipe.image}" class="recipe-image" alt="${recipe.title}">
+            </a>
             <div class="recipe-content">
                 <h3 class="recipe-title">
                     ${recipe.title}
@@ -23,14 +28,13 @@ function displayRecipes(recipeList){
                     <span class="time">
                         ${recipe.time}
                     </span>
-                    <img src="${recipe.favourite ? 'images/icons/HeartFilled.png' : 'images/icons/HeartUnfilled.png'}" class="heart" onclick="toggleFavourite(${recipe.id}, this)" alt="Favourite">
+                    <img src="${isFavourite ? "images/icons/heart-filled.png" : "images/icons/heart.png"}" class="heart" onclick="toggleFavourite(${recipe.id})">
                 </div>
             </div>
-        </a>
+        </div>
         `;
     });
 }
-
 displayRecipes(recipes);
 
 /* Search */
@@ -46,14 +50,18 @@ searchInput.addEventListener("keyup", () => {
 
 /* Favourite */
 
-function toggleFavourite(id, heart){
-    const recipe = recipes.find(recipe => recipe.id === id);
-    recipe.favourite = !recipe.favourite;
-    if(recipe.favourite){
-        heart.src = "images/icons/HeartFilled.png";
+function toggleFavourite(id){
+    const index = favourites.indexOf(id);
+    if(index === -1){
+        favourites.push(id);
     }else{
-        heart.src = "images/icons/HeartUnfilled.png";
+        favourites.splice(index,1);
     }
+    localStorage.setItem(
+        "favourites",
+        JSON.stringify(favourites)
+    );
+    displayRecipes(recipes);
 }
 
 /* Login */
