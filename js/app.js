@@ -28,7 +28,7 @@ function displayRecipes(recipeList){
                     <span class="time">
                         ${recipe.time}
                     </span>
-                    <img src="${isFavourite ? "images/icons/heart-filled.png" : "images/icons/heart.png"}" class="heart" onclick="toggleFavourite(${recipe.id})">
+                    <img src="${isFavourite ? "images/icons/HeartFilled.png" : "images/icons/heart.png"}" class="heart" onclick="toggleFavourite(${recipe.id})">
                 </div>
             </div>
         </div>
