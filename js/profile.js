@@ -2,30 +2,82 @@ const profileName = document.getElementById("profileName");
 const profileEmail = document.getElementById("profileEmail");
 const recipeGrid = document.getElementById("profileRecipeGrid");
 const savedGrid = document.getElementById("savedGrid");
-const userRecipes = JSON.parse(localStorage.getItem("userRecipes")) || [];
-const allRecipes = [...recipes, ...userRecipes];
+const userId = localStorage.getItem("userId");
 
-// User Information
-profileName.textContent = localStorage.getItem("userName") || "Bikisha Maharjan";
-profileEmail.textContent = localStorage.getItem("userEmail") || "bikisha@email.com";
-
-// Statistics
-document.getElementById("recipeCount").textContent = userRecipes.length;
-const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
-const favouriteRecipes = allRecipes.filter(function(recipe){
-    return favourites.includes(recipe.id);
-});
-document.getElementById("favCount").textContent = favouriteRecipes.length;
-
-if(userRecipes.length === 0){
+// Check login
+if (!userId) {
+    profileName.textContent = "Guest User";
+    profileEmail.textContent = "Please log in";
     recipeGrid.innerHTML = `
         <div class="empty-state">
-            <h3>No recipes created yet.</h3>
-            <a href="create.html" class="new-btn">Create</a>
+            <h3>Please log in to view your profile.</h3>
+            <a href="login.html" class="new-btn">Login</a>
         </div>
     `;
-}else{
-    userRecipes.forEach(function(recipe){
+    savedGrid.innerHTML = "";
+} else {
+    loadProfile();
+}
+
+// Load profile data
+async function loadProfile() {
+    try {
+        // Get user information
+        const userResponse = await fetch(`http://localhost:3000/api/users/${userId}`);
+        const userData = await userResponse.json();
+        if (!userResponse.ok) {
+            alert(userData.message || "Could not load profile.");
+            return;
+        }
+
+        // Display user information
+        profileName.textContent = userData.name || "Bikisha Maharjan";
+        profileEmail.textContent = userData.email || "No email";
+
+        // Get user's recipes
+        const recipeResponse = await fetch(`http://localhost:3000/api/recipes/user/${userId}`);
+        const userRecipes = await recipeResponse.json();
+        if (!recipeResponse.ok) {
+            alert(userRecipes.message || "Could not load your recipes.");
+            return;
+        }
+
+        // Get user's favourites
+        const favouriteResponse = await fetch(`http://localhost:3000/api/favourites/${userId}`);
+        const favouriteRecipes = await favouriteResponse.json();
+        if (!favouriteResponse.ok) {
+            alert(favouriteRecipes.message || "Could not load favourites.");
+            return;
+        }
+        
+        document.getElementById("recipeCount").textContent = userRecipes.length;
+        document.getElementById("favCount").textContent = favouriteRecipes.length;
+
+        // Display created recipes
+        displayUserRecipes(userRecipes);
+
+        // Display saved recipes
+        displayFavouriteRecipes(favouriteRecipes);
+    } catch (error) {
+        console.error(error);
+        alert("Could not connect to server.");
+    }
+}
+
+// Display user's recipes
+function displayUserRecipes(userRecipes) {
+    recipeGrid.innerHTML = "";
+    if (userRecipes.length === 0) {
+        recipeGrid.innerHTML = `
+            <div class="empty-state">
+                <h3>No recipes created yet.</h3>
+                <a href="create.html" class="new-btn">Create</a>
+            </div>
+        `;
+        return;
+    }
+
+    userRecipes.forEach(function(recipe) {
         recipeGrid.innerHTML += `
             <a href="recipe.html?id=${recipe.id}" class="profile-card-small">
                 <img src="${recipe.image}" alt="${recipe.title}">
@@ -35,15 +87,19 @@ if(userRecipes.length === 0){
     });
 }
 
-if(favouriteRecipes.length === 0){
-    savedGrid.innerHTML = `
-        <div class="empty-state">
-            <h3>No favourites yet.</h3>
-            <a href="index.html" class="new-btn">Explore</a>
-        </div>
-    `;
-}else{
-    favouriteRecipes.forEach(function(recipe){
+// Display favourite recipes
+function displayFavouriteRecipes(favouriteRecipes) {
+    savedGrid.innerHTML = "";
+    if (favouriteRecipes.length === 0) {
+        savedGrid.innerHTML = `
+            <div class="empty-state">
+                <h3>No favourites yet.</h3>
+                <a href="index.html" class="new-btn">Explore</a>
+            </div>
+        `;
+        return;
+    }
+    favouriteRecipes.forEach(function(recipe) {
         savedGrid.innerHTML += `
             <a href="recipe.html?id=${recipe.id}" class="profile-card-small">
                 <img src="${recipe.image}" alt="${recipe.title}">
@@ -53,20 +109,21 @@ if(favouriteRecipes.length === 0){
     });
 }
 
+// Tabs
 const tabs = document.querySelectorAll(".tab");
-tabs.forEach(function(tab){
-    tab.onclick = function(){
-        document.querySelectorAll(".tab").forEach(function(t){
+tabs.forEach(function(tab) {
+    tab.onclick = function() {
+        document.querySelectorAll(".tab").forEach(function(t) {
             t.classList.remove("active");
         });
-        document.querySelectorAll(".tab-content").forEach(function(content){
+        document.querySelectorAll(".tab-content").forEach(function(content) {
             content.classList.remove("active");
         });
         tab.classList.add("active");
-        if(tab.dataset.tab === "recipes"){
+        if (tab.dataset.tab === "recipes") {
             document.getElementById("recipesTab").classList.add("active");
         }
-        if(tab.dataset.tab === "saved"){
+        if (tab.dataset.tab === "saved") {
             document.getElementById("savedTab").classList.add("active");
         }
     };
