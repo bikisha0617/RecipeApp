@@ -3,6 +3,7 @@ const profileEmail = document.getElementById("profileEmail");
 const recipeGrid = document.getElementById("profileRecipeGrid");
 const savedGrid = document.getElementById("savedGrid");
 const userRecipes = JSON.parse(localStorage.getItem("userRecipes")) || [];
+const allRecipes = [...recipes, ...userRecipes];
 
 // User Information
 profileName.textContent = localStorage.getItem("userName") || "Bikisha Maharjan";
@@ -11,7 +12,7 @@ profileEmail.textContent = localStorage.getItem("userEmail") || "bikisha@email.c
 // Statistics
 document.getElementById("recipeCount").textContent = userRecipes.length;
 const favourites = JSON.parse(localStorage.getItem("favourites")) || [];
-const favouriteRecipes = recipes.filter(function(recipe){
+const favouriteRecipes = allRecipes.filter(function(recipe){
     return favourites.includes(recipe.id);
 });
 document.getElementById("favCount").textContent = favouriteRecipes.length;

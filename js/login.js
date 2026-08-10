@@ -9,7 +9,8 @@ form.addEventListener("submit", function(e){
         return;
     }
 
-    localStorage.setItem("loggedIn","true");
-    localStorage.setItem("userName","Bikisha Maharjan");
-    window.location="index.html";
-});
+    localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("userName", "Bikisha Maharjan");
+    localStorage.setItem("userEmail", email);
+    window.location.href = "index.html";
+    });

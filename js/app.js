@@ -1,8 +1,5 @@
 const recipeContainer = document.getElementById("recipeContainer");
 const searchInput = document.getElementById("searchInput");
-const dropdownBtn = document.getElementById("dropdownBtn");
-const dropdownMenu = document.getElementById("dropdownMenu");
-const loginBtn = document.getElementById("loginBtn");
 
 let favourites = JSON.parse(localStorage.getItem("favourites")) || [];
 
@@ -28,7 +25,7 @@ function displayRecipes(recipeList){
                     <span class="time">
                         ${recipe.time}
                     </span>
-                    <img src="${isFavourite ? "images/icons/HeartFilled.png" : "images/icons/heart.png"}" class="heart" onclick="toggleFavourite(${recipe.id})">
+                    <img src="${isFavourite ? "images/icons/HeartFilled.png" : "images/icons/HeartUnfilled.png"}" class="heart" onclick="toggleFavourite(${recipe.id})">
                 </div>
             </div>
         </div>
@@ -39,14 +36,16 @@ displayRecipes(recipes);
 
 /* Search */
 
-searchInput.addEventListener("keyup", () => {
-    const keyword = searchInput.value.toLowerCase();
-    displayRecipes(
-        recipes.filter(recipe =>
-            recipe.title.toLowerCase().includes(keyword)
-        )
-    );
-});
+if (searchInput) {
+    searchInput.addEventListener("keyup", () => {
+        const keyword = searchInput.value.toLowerCase();
+        displayRecipes(
+            recipes.filter(recipe =>
+                recipe.title.toLowerCase().includes(keyword)
+            )
+        );
+    });
+};
 
 /* Favourite */
 
