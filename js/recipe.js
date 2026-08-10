@@ -17,6 +17,7 @@ if(recipe){
     document.getElementById("recipeAuthor").textContent = "By " + recipe.author;
     document.getElementById("recipeTime").textContent = recipe.time;
     document.getElementById("recipeServings").textContent = recipe.servings || "-";
+    document.getElementById("recipeDifficulty").textContent = recipe.difficulty || "-";
     document.getElementById("recipeDescription").textContent = recipe.description || "";
     const ingredientsList = document.getElementById("ingredientsList");
     ingredientsList.innerHTML = "";

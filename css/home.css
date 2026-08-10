@@ -165,8 +165,6 @@ hr{
     background:#FCE8D9;
 }
 
-/* Main */
-
 .container{
     display:flex;
     padding:30px;
@@ -208,7 +206,7 @@ hr{
 }
 
 .settings{
-    margin-top:140px;
+    margin-top:270px;
     display:flex;
     align-items:center;
     justify-content:center;

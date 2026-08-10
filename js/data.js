@@ -8,6 +8,7 @@ const recipes = [
     favourite:false,
     description:"A healthy and filling breakfast with creamy avocado, crispy toast, and a perfectly cooked egg.",
     servings:"2",
+    difficulty:"Easy",
     ingredients:[
         "2 slices bread",
         "1 ripe avocado",
@@ -40,6 +41,7 @@ const recipes = [
     favourite:false,
     description:"A creamy pasta with vegetables in a rich white sauce.",
     servings:"2",
+    difficulty:"Medium",
     ingredients:[
         "200 g pasta",
         "2 tbsp butter",
@@ -76,6 +78,7 @@ const recipes = [
     favourite:false,
     description:"A quick and healthy wrap filled with fresh vegetables.",
     servings:"2",
+    difficulty:"Easy",
     ingredients:[
         "2 tortillas or chapatis",
         "1 cup shredded lettuce",
@@ -110,6 +113,7 @@ const recipes = [
     favourite:false,
     description:"A rich and flavorful chicken curry made with aromatic spices.",
     servings:"4",
+    difficulty:"Hard",
     ingredients:[
         "500g chicken",
         "2 onions",
@@ -146,6 +150,7 @@ const recipes = [
     favourite:false,
     description:"Soft, naturally sweet pancakes perfect for breakfast.",
     servings:"2",
+    difficulty:"Easy",
     ingredients:[
         "2 ripe bananas",
         "½ cup flour",
@@ -185,6 +190,7 @@ const recipes = [
     favourite:false,
     description:"Flavorful rice stir-fried with colorful vegetables.",
     servings:"2",
+    difficulty:"Medium",
     ingredients:[
         "2 cups cooked rice",
         "1 cup mixed vegetables",
@@ -220,6 +226,7 @@ const recipes = [
     favourite:false,
     description:"A refreshing mix of seasonal fruits, perfect for a healthy snack.",
     servings:"2",
+    difficulty:"Easy",
     ingredients:[
         "1 cup apples, diced",
         "1 cup grapes, halved",
@@ -251,6 +258,7 @@ const recipes = [
     favourite:false,
     description:"A delicious and easy-to-make stir-fry with tender noodles and colorful vegetables.",
     servings:"2",
+    difficulty:"Medium",
     ingredients:[
         "200g stir-fry noodles",
         "1 cup mixed vegetables",
@@ -286,6 +294,7 @@ const recipes = [
     favourite:false,
     description:"A quick and easy dessert that can be made in a microwave.",
     servings:"2",
+    difficulty:"Easy",
     ingredients:[
         "4 tbsp flour",
         "2 tbsp cocoa powder",
@@ -318,6 +327,7 @@ const recipes = [
     favourite:false,
     description:"Creamy tomato-based curry with soft paneer cubes.",
     servings:"2",
+    difficulty:"Hard",
     ingredients:[
         "200g paneer, cubed",
         "1 cup tomatoes, chopped",
@@ -353,6 +363,7 @@ const recipes = [
     favourite:false,
     description:"A protein-rich salad with grilled chicken and fresh vegetables.",
     servings:"2",
+    difficulty:"Medium",
     ingredients:[
         "2 chicken breasts",
         "4 cups mixed salad greens",
@@ -386,6 +397,7 @@ const recipes = [
     favourite:false,
     description:"A fluffy omelette filled with fresh vegetables.",
     servings:"1",
+    difficulty:"Easy",
     ingredients:[
         "2 eggs",
         "¼ cup chopped onion",
