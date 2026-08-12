@@ -1,38 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
 const db = require("../database");
-
-// Get all recipes
-router.get("/", (req, res) => {
-
-    const sql = `
-        SELECT
-            recipes.*,
-            users.name AS author
-        FROM recipes
-        LEFT JOIN users
-        ON recipes.user_id = users.id
-        ORDER BY recipes.id ASC
-    `;
-
-    db.all(sql, [], (err, recipes) => {
-
-        if (err) {
-            return res.status(500).json({
-                message: "Database error."
-            });
-        }
-
-        recipes.forEach(recipe => {
-            recipe.ingredients = [];
-            recipe.instructions = [];
-        });
-
-        res.json(recipes);
-    });
-});
-
 
 // Get recipes created by a user
 router.get("/user/:userId", (req, res) => {
@@ -41,14 +9,10 @@ router.get("/user/:userId", (req, res) => {
 
     db.all(
         `
-        SELECT
-            recipes.*,
-            users.name AS author
+        SELECT *
         FROM recipes
-        LEFT JOIN users
-        ON recipes.user_id = users.id
-        WHERE recipes.user_id = ?
-        ORDER BY recipes.id DESC
+        WHERE user_id = ?
+        ORDER BY id DESC
         `,
         [userId],
         (err, recipes) => {
@@ -59,9 +23,32 @@ router.get("/user/:userId", (req, res) => {
                 });
             }
 
+            recipes.forEach(recipe => {
+
+                db.all(
+                    `
+                    SELECT ingredient
+                    FROM ingredients
+                    WHERE recipe_id = ?
+                    `,
+                    [recipe.id],
+                    (err, ingredients) => {
+
+                        if (!err) {
+                            recipe.ingredients = ingredients.map(
+                                item => item.ingredient
+                            );
+                        }
+
+                    }
+                );
+
+            });
+
             res.json(recipes);
         }
     );
+
 });
 
 
@@ -72,13 +59,9 @@ router.get("/:id", (req, res) => {
 
     db.get(
         `
-        SELECT
-            recipes.*,
-            users.name AS author
+        SELECT *
         FROM recipes
-        LEFT JOIN users
-        ON recipes.user_id = users.id
-        WHERE recipes.id = ?
+        WHERE id = ?
         `,
         [recipeId],
         (err, recipe) => {
@@ -95,13 +78,11 @@ router.get("/:id", (req, res) => {
                 });
             }
 
-            // Get ingredients
             db.all(
                 `
                 SELECT ingredient
                 FROM ingredients
                 WHERE recipe_id = ?
-                ORDER BY id ASC
                 `,
                 [recipeId],
                 (err, ingredients) => {
@@ -112,13 +93,11 @@ router.get("/:id", (req, res) => {
                         });
                     }
 
-                    // Get instructions
                     db.all(
                         `
                         SELECT instruction
                         FROM instructions
                         WHERE recipe_id = ?
-                        ORDER BY id ASC
                         `,
                         [recipeId],
                         (err, instructions) => {
@@ -137,13 +116,35 @@ router.get("/:id", (req, res) => {
                                 item => item.instruction
                             );
 
-                            res.json(recipe);
+                            // Author name
+                            db.get(
+                                `
+                                SELECT name
+                                FROM users
+                                WHERE id = ?
+                                `,
+                                [recipe.user_id],
+                                (err, user) => {
+
+                                    if (!err && user) {
+                                        recipe.author = user.name;
+                                    } else {
+                                        recipe.author = "Unknown";
+                                    }
+
+                                    res.json(recipe);
+                                }
+                            );
+
                         }
                     );
+
                 }
             );
+
         }
     );
+
 });
 
 
@@ -194,10 +195,10 @@ router.post("/", (req, res) => {
             user_id,
             title,
             description,
-            category || "",
+            category,
             time,
             servings,
-            image || "images/recipes/default.jpg"
+            image || ""
         ],
         function (err) {
 
@@ -211,16 +212,14 @@ router.post("/", (req, res) => {
 
             const recipeId = this.lastID;
 
-            // Save ingredients
-            if (Array.isArray(ingredients) && ingredients.length > 0) {
+            // Add ingredients
+            if (ingredients && ingredients.length > 0) {
 
-                const ingredientStmt = db.prepare(
-                    `
+                const ingredientStmt = db.prepare(`
                     INSERT INTO ingredients
                     (recipe_id, ingredient)
                     VALUES (?, ?)
-                    `
-                );
+                `);
 
                 ingredients.forEach(ingredient => {
                     ingredientStmt.run(recipeId, ingredient);
@@ -229,16 +228,14 @@ router.post("/", (req, res) => {
                 ingredientStmt.finalize();
             }
 
-            // Save instructions
-            if (Array.isArray(instructions) && instructions.length > 0) {
+            // Add instructions
+            if (instructions && instructions.length > 0) {
 
-                const instructionStmt = db.prepare(
-                    `
+                const instructionStmt = db.prepare(`
                     INSERT INTO instructions
                     (recipe_id, instruction)
                     VALUES (?, ?)
-                    `
-                );
+                `);
 
                 instructions.forEach(instruction => {
                     instructionStmt.run(recipeId, instruction);
@@ -251,8 +248,10 @@ router.post("/", (req, res) => {
                 message: "Recipe created successfully.",
                 recipeId: recipeId
             });
+
         }
     );
+
 });
 
 
@@ -261,27 +260,39 @@ router.delete("/:id", (req, res) => {
 
     const recipeId = req.params.id;
 
+    // Delete favourites
+    db.run(
+        `
+        DELETE FROM favourites
+        WHERE recipe_id = ?
+        `,
+        [recipeId]
+    );
+
     // Delete ingredients
     db.run(
-        `DELETE FROM ingredients WHERE recipe_id = ?`,
+        `
+        DELETE FROM ingredients
+        WHERE recipe_id = ?
+        `,
         [recipeId]
     );
 
     // Delete instructions
     db.run(
-        `DELETE FROM instructions WHERE recipe_id = ?`,
-        [recipeId]
-    );
-
-    // Delete favourites
-    db.run(
-        `DELETE FROM favourites WHERE recipe_id = ?`,
+        `
+        DELETE FROM instructions
+        WHERE recipe_id = ?
+        `,
         [recipeId]
     );
 
     // Delete recipe
     db.run(
-        `DELETE FROM recipes WHERE id = ?`,
+        `
+        DELETE FROM recipes
+        WHERE id = ?
+        `,
         [recipeId],
         function (err) {
 
@@ -300,9 +311,10 @@ router.delete("/:id", (req, res) => {
             res.json({
                 message: "Recipe deleted successfully."
             });
+
         }
     );
-});
 
+});
 
 module.exports = router;

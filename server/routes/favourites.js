@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-
 const db = require("../database");
+
 
 // Get user's favourites
 router.get("/:userId", (req, res) => {
@@ -25,53 +25,163 @@ router.get("/:userId", (req, res) => {
             });
         }
 
-        res.json(recipes);
+        // Add author name
+        let completed = 0;
+
+        if (recipes.length === 0) {
+            return res.json([]);
+        }
+
+        recipes.forEach(function (recipe) {
+
+            db.get(
+                `
+                SELECT name
+                FROM users
+                WHERE id = ?
+                `,
+                [recipe.user_id],
+                function (err, user) {
+
+                    if (!err && user) {
+                        recipe.author = user.name;
+                    } else {
+                        recipe.author = "Unknown";
+                    }
+
+                    completed++;
+
+                    if (completed === recipes.length) {
+                        res.json(recipes);
+                    }
+
+                }
+            );
+
+        });
+
     });
+
 });
+
 
 // Add favourite
 router.post("/", (req, res) => {
 
-    const { user_id, recipe_id } = req.body;
+    const {
+        user_id,
+        recipe_id
+    } = req.body;
 
     if (!user_id || !recipe_id) {
         return res.status(400).json({
-            message: "User ID and recipe ID are required."
+            message: "Missing user or recipe."
+        });
+    }
+
+    // Check if already favourite
+    db.get(
+        `
+        SELECT id
+        FROM favourites
+        WHERE user_id = ?
+        AND recipe_id = ?
+        `,
+        [user_id, recipe_id],
+        (err, favourite) => {
+
+            if (err) {
+                return res.status(500).json({
+                    message: "Database error."
+                });
+            }
+
+            if (favourite) {
+                return res.json({
+                    message: "Recipe is already a favourite."
+                });
+            }
+
+            db.run(
+                `
+                INSERT INTO favourites
+                (user_id, recipe_id)
+                VALUES (?, ?)
+                `,
+                [user_id, recipe_id],
+                function (err) {
+
+                    if (err) {
+                        return res.status(500).json({
+                            message: "Could not add favourite."
+                        });
+                    }
+
+                    res.json({
+                        message: "Recipe added to favourites."
+                    });
+
+                }
+            );
+
+        }
+    );
+
+});
+
+
+// Remove favourite
+router.delete("/", (req, res) => {
+
+    const {
+        user_id,
+        recipe_id
+    } = req.body;
+
+    if (!user_id || !recipe_id) {
+        return res.status(400).json({
+            message: "Missing user or recipe."
         });
     }
 
     db.run(
         `
-        INSERT OR IGNORE INTO favourites
-        (user_id, recipe_id)
-        VALUES (?, ?)
+        DELETE FROM favourites
+        WHERE user_id = ?
+        AND recipe_id = ?
         `,
         [user_id, recipe_id],
         function (err) {
 
             if (err) {
                 return res.status(500).json({
-                    message: "Could not add favourite."
+                    message: "Could not remove favourite."
                 });
             }
 
             res.json({
-                message: "Recipe added to favourites."
+                message: "Recipe removed from favourites."
             });
+
         }
     );
+
 });
 
-// Remove favourite
+
+// Remove favourite using URL parameters
 router.delete("/:userId/:recipeId", (req, res) => {
 
-    const userId = req.params.userId;
-    const recipeId = req.params.recipeId;
+    const {
+        userId,
+        recipeId
+    } = req.params;
 
     db.run(
         `
         DELETE FROM favourites
-        WHERE user_id = ? AND recipe_id = ?
+        WHERE user_id = ?
+        AND recipe_id = ?
         `,
         [userId, recipeId],
         function (err) {
@@ -85,8 +195,11 @@ router.delete("/:userId/:recipeId", (req, res) => {
             res.json({
                 message: "Recipe removed from favourites."
             });
+
         }
     );
+
 });
+
 
 module.exports = router;

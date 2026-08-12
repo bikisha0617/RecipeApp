@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-
 const db = require("./database");
 
 const authRoutes = require("./routes/auth");
@@ -24,6 +23,7 @@ app.get("/", (req, res) => {
 
 // Test database
 app.get("/api/test-db", (req, res) => {
+
     db.get("SELECT 1 AS result", [], (err, row) => {
 
         if (err) {
@@ -37,9 +37,10 @@ app.get("/api/test-db", (req, res) => {
             result: row.result
         });
     });
+
 });
 
-// API routes
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/recipes", recipeRoutes);
 app.use("/api/favourites", favouriteRoutes);
