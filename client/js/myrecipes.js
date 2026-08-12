@@ -24,7 +24,7 @@ if (!userId) {
 
 
 // ===============================
-// Fix Image URL
+// Image URL Helper
 // ===============================
 
 function getImageUrl(image) {
@@ -33,6 +33,14 @@ function getImageUrl(image) {
         return "images/placeholder.jpg";
     }
 
+    image = String(image).trim();
+
+    if (image === "") {
+        return "images/placeholder.jpg";
+    }
+
+
+    // Already a complete URL
     if (
         image.startsWith("http://") ||
         image.startsWith("https://")
@@ -40,17 +48,35 @@ function getImageUrl(image) {
         return image;
     }
 
-    if (image.startsWith("/uploads/")) {
 
-        return "http://localhost:3000" + image;
+    // If database contains /uploads/filename
+    if (image.includes("/uploads/")) {
+
+        const filename =
+            image.split("/uploads/").pop();
+
+        return (
+            "http://localhost:3000/uploads/" +
+            filename
+        );
     }
 
+
+    // If database contains uploads/filename
     if (image.startsWith("uploads/")) {
 
-        return "http://localhost:3000/" + image;
+        return (
+            "http://localhost:3000/" +
+            image
+        );
     }
 
-    return "http://localhost:3000/uploads/" + image;
+
+    // If database only contains filename
+    return (
+        "http://localhost:3000/uploads/" +
+        image
+    );
 }
 
 
@@ -60,9 +86,17 @@ function getImageUrl(image) {
 
 function displayRecipes(recipeList) {
 
+    if (!recipeGrid) {
+        return;
+    }
+
     recipeGrid.innerHTML = "";
 
-    if (recipeList.length === 0) {
+
+    if (
+        !recipeList ||
+        recipeList.length === 0
+    ) {
 
         recipeGrid.innerHTML = `
             <p class="empty-message">
@@ -79,37 +113,41 @@ function displayRecipes(recipeList) {
         const imageUrl =
             getImageUrl(recipe.image);
 
+
         recipeGrid.innerHTML += `
             <div class="recipe-box">
 
                 <img
                     src="${imageUrl}"
-                    alt="${recipe.title}"
-                    onerror="this.src='images/placeholder.jpg'"
+                    alt="${recipe.title || "Recipe"}"
+                    class="recipe-image"
+                    onerror="this.onerror=null; this.src='images/placeholder.jpg';"
                 >
 
                 <div class="recipe-info">
 
                     <h3>
-                        ${recipe.title}
+                        ${recipe.title || ""}
                     </h3>
 
                     <p>
-                        ${recipe.time} mins
+                        ${recipe.time || "-"} mins
                     </p>
 
                     <div class="recipe-actions">
 
                         <button
+                            type="button"
                             class="view-btn"
-                            onclick="viewRecipe(${recipe.id})"
+                            onclick="viewRecipe(${Number(recipe.id)})"
                         >
                             View
                         </button>
 
                         <button
+                            type="button"
                             class="delete-btn"
-                            onclick="deleteRecipe(${recipe.id})"
+                            onclick="deleteRecipe(${Number(recipe.id)})"
                         >
                             Delete
                         </button>
@@ -130,11 +168,17 @@ function displayRecipes(recipeList) {
 
 async function loadRecipes() {
 
+    if (!userId) {
+        return;
+    }
+
     try {
 
-        const response = await fetch(
-            `http://localhost:3000/api/recipes/user/${userId}`
-        );
+        const response =
+            await fetch(
+                `http://localhost:3000/api/recipes/user/${userId}`
+            );
+
 
         const data =
             await response.json();
@@ -151,7 +195,11 @@ async function loadRecipes() {
         }
 
 
-        userRecipes = data;
+        userRecipes =
+            Array.isArray(data)
+                ? data
+                : [];
+
 
         displayRecipes(userRecipes);
 
@@ -190,9 +238,12 @@ if (searchInput) {
                 userRecipes.filter(
                     function (recipe) {
 
-                        return recipe.title
-                            .toLowerCase()
-                            .includes(keyword);
+                        return (
+                            recipe.title &&
+                            recipe.title
+                                .toLowerCase()
+                                .includes(keyword)
+                        );
                     }
                 );
 
@@ -210,7 +261,7 @@ if (searchInput) {
 function viewRecipe(id) {
 
     window.location.href =
-        `recipe.html?id=${id}`;
+        `recipe.html?id=${Number(id)}`;
 }
 
 
@@ -233,7 +284,7 @@ async function deleteRecipe(id) {
 
         const response =
             await fetch(
-                `http://localhost:3000/api/recipes/${id}`,
+                `http://localhost:3000/api/recipes/${Number(id)}`,
                 {
                     method: "DELETE"
                 }
@@ -260,7 +311,7 @@ async function deleteRecipe(id) {
         );
 
 
-        loadRecipes();
+        await loadRecipes();
 
 
     } catch (error) {

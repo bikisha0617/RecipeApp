@@ -10,18 +10,85 @@ const userId =
 let favouriteRecipes = [];
 
 
-// Check login
+// ===============================
+// Image URL Helper
+// ===============================
+
+function getImageUrl(image) {
+
+    if (!image) {
+        return "images/placeholder.jpg";
+    }
+
+    image = String(image).trim();
+
+    if (image === "") {
+        return "images/placeholder.jpg";
+    }
+
+
+    // Complete URL
+    if (
+        image.startsWith("http://") ||
+        image.startsWith("https://")
+    ) {
+        return image;
+    }
+
+
+    // Contains /uploads/
+    if (image.includes("/uploads/")) {
+
+        const filename =
+            image.split("/uploads/").pop();
+
+        return (
+            "http://localhost:3000/uploads/" +
+            filename
+        );
+    }
+
+
+    // uploads/filename
+    if (image.startsWith("uploads/")) {
+
+        return (
+            "http://localhost:3000/" +
+            image
+        );
+    }
+
+
+    // Filename only
+    return (
+        "http://localhost:3000/uploads/" +
+        image
+    );
+}
+
+
+// ===============================
+// Login Check
+// ===============================
+
 if (!userId) {
 
-    favouriteGrid.innerHTML = `
-        <div class="empty-state">
-            <h2>Please log in first</h2>
+    if (favouriteGrid) {
 
-            <a href="login.html">
-                Login
-            </a>
-        </div>
-    `;
+        favouriteGrid.innerHTML = `
+            <div class="empty-state">
+
+                <h2>
+                    Please log in first
+                </h2>
+
+                <a href="login.html">
+                    Login
+                </a>
+
+            </div>
+        `;
+    }
 
 } else {
 
@@ -29,16 +96,23 @@ if (!userId) {
 }
 
 
-// Load favourites
+// ===============================
+// Load Favourites
+// ===============================
+
 async function loadFavourites() {
 
     try {
 
-        const response = await fetch(
-            `http://localhost:3000/api/favourites/${userId}`
-        );
+        const response =
+            await fetch(
+                `http://localhost:3000/api/favourites/${userId}`
+            );
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
 
         if (!response.ok) {
 
@@ -50,9 +124,17 @@ async function loadFavourites() {
             return;
         }
 
-        favouriteRecipes = data;
 
-        displayRecipes(favouriteRecipes);
+        favouriteRecipes =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        displayRecipes(
+            favouriteRecipes
+        );
+
 
     } catch (error) {
 
@@ -61,26 +143,41 @@ async function loadFavourites() {
             error
         );
 
-        favouriteGrid.innerHTML = `
-            <div class="empty-state">
 
-                <h2>
-                    Could not connect to server
-                </h2>
+        if (favouriteGrid) {
 
-            </div>
-        `;
+            favouriteGrid.innerHTML = `
+                <div class="empty-state">
+
+                    <h2>
+                        Could not connect to server
+                    </h2>
+
+                </div>
+            `;
+        }
     }
 }
 
 
-// Display favourites
+// ===============================
+// Display Favourites
+// ===============================
+
 function displayRecipes(recipeList) {
+
+    if (!favouriteGrid) {
+        return;
+    }
+
 
     favouriteGrid.innerHTML = "";
 
 
-    if (recipeList.length === 0) {
+    if (
+        !recipeList ||
+        recipeList.length === 0
+    ) {
 
         favouriteGrid.innerHTML = `
             <div class="empty-state">
@@ -100,67 +197,77 @@ function displayRecipes(recipeList) {
     }
 
 
-    recipeList.forEach(function (recipe) {
+    recipeList.forEach(
+        function (recipe) {
 
-        const image =
-            recipe.image ||
-            "images/recipes/default.jpg";
+            const image =
+                getImageUrl(
+                    recipe.image
+                );
 
 
-        favouriteGrid.innerHTML += `
-            <div class="recipe-card">
+            favouriteGrid.innerHTML += `
+                <div class="recipe-card">
 
-                <a href="recipe.html?id=${recipe.id}">
-
-                    <img
-                        src="${image}"
-                        alt="${recipe.title}"
-                        class="recipe-image"
-                        onerror="this.src='images/recipes/default.jpg';"
+                    <a
+                        href="recipe.html?id=${Number(recipe.id)}"
                     >
 
-                </a>
-
-
-                <div class="recipe-content">
-
-                    <h3>
-                        ${recipe.title}
-                    </h3>
-
-                    <p>
-                        ${recipe.time || "-"}
-                    </p>
-
-
-                    <div class="buttons">
-
-                        <button
-                            class="view-btn"
-                            onclick="viewRecipe(${recipe.id})"
+                        <img
+                            src="${image}"
+                            alt="${recipe.title || "Recipe"}"
+                            class="recipe-image"
+                            onerror="this.onerror=null; this.src='images/placeholder.jpg';"
                         >
-                            View
-                        </button>
+
+                    </a>
 
 
-                        <button
-                            class="remove-btn"
-                            onclick="removeFavourite(${recipe.id})"
-                        >
-                            Remove
-                        </button>
+                    <div class="recipe-content">
+
+                        <h3>
+                            ${recipe.title || ""}
+                        </h3>
+
+                        <p>
+                            ${recipe.time || "-"} mins
+                        </p>
+
+
+                        <div class="buttons">
+
+                            <button
+                                type="button"
+                                class="view-btn"
+                                onclick="viewRecipe(${Number(recipe.id)})"
+                            >
+                                View
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="remove-btn"
+                                onclick="removeFavourite(${Number(recipe.id)})"
+                            >
+                                Remove
+                            </button>
+
+                        </div>
 
                     </div>
 
                 </div>
-
-            </div>
-        `;
-    });
+            `;
+        }
+    );
 }
 
 
+// ===============================
 // Search
+// ===============================
+
 if (searchInput) {
 
     searchInput.addEventListener(
@@ -177,40 +284,52 @@ if (searchInput) {
                 favouriteRecipes.filter(
                     function (recipe) {
 
-                        return recipe.title
-                            .toLowerCase()
-                            .includes(keyword);
+                        return (
+                            recipe.title &&
+                            recipe.title
+                                .toLowerCase()
+                                .includes(keyword)
+                        );
                     }
                 );
 
 
-            displayRecipes(filtered);
+            displayRecipes(
+                filtered
+            );
         }
     );
 }
 
 
-// Remove favourite
+// ===============================
+// Remove Favourite
+// ===============================
+
 async function removeFavourite(recipeId) {
 
     try {
 
-        const response = await fetch(
-            "http://localhost:3000/api/favourites",
-            {
-                method: "DELETE",
+        const response =
+            await fetch(
+                "http://localhost:3000/api/favourites",
+                {
+                    method: "DELETE",
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
-                    user_id: Number(userId),
-                    recipe_id: Number(recipeId)
-                })
-            }
-        );
+                    body: JSON.stringify({
+                        user_id:
+                            Number(userId),
+
+                        recipe_id:
+                            Number(recipeId)
+                    })
+                }
+            );
 
 
         const data =
@@ -232,13 +351,18 @@ async function removeFavourite(recipeId) {
             favouriteRecipes.filter(
                 function (recipe) {
 
-                    return Number(recipe.id) !==
-                        Number(recipeId);
+                    return (
+                        Number(recipe.id) !==
+                        Number(recipeId)
+                    );
                 }
             );
 
 
-        displayRecipes(favouriteRecipes);
+        displayRecipes(
+            favouriteRecipes
+        );
+
 
     } catch (error) {
 
@@ -254,9 +378,12 @@ async function removeFavourite(recipeId) {
 }
 
 
-// View recipe
+// ===============================
+// View Recipe
+// ===============================
+
 function viewRecipe(id) {
 
     window.location.href =
-        "recipe.html?id=" + id;
+        `recipe.html?id=${Number(id)}`;
 }

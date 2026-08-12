@@ -1,272 +1,410 @@
 const express = require("express");
 const router = express.Router();
+
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+
 const db = require("../database");
 
-// Make sure uploads folder exists
-const uploadDir = path.join(__dirname, "..", "uploads");
+
+// =====================================================
+// Upload Directory
+// =====================================================
+
+const uploadDir =
+    path.join(__dirname, "..", "uploads");
+
 
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+
+    fs.mkdirSync(
+        uploadDir,
+        {
+            recursive: true
+        }
+    );
 }
 
-// Image upload settings
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
 
-    filename: function (req, file, cb) {
-        const extension = path.extname(file.originalname);
+// =====================================================
+// Multer Storage
+// =====================================================
 
-        const filename =
-            Date.now() +
-            "-" +
-            Math.round(Math.random() * 1E9) +
-            extension;
+const storage =
+    multer.diskStorage({
 
-        cb(null, filename);
-    }
-});
+        destination: function (
+            req,
+            file,
+            cb
+        ) {
 
-const upload = multer({
-    storage: storage,
-
-    fileFilter: function (req, file, cb) {
-
-        const allowedTypes = [
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
-            "image/webp"
-        ];
-
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error("Only JPG, JPEG, PNG and WEBP images are allowed."));
-        }
-    },
-
-    limits: {
-        fileSize: 5 * 1024 * 1024
-    }
-});
+            cb(
+                null,
+                uploadDir
+            );
+        },
 
 
-// Get recipes created by a user
-router.get("/user/:userId", (req, res) => {
+        filename: function (
+            req,
+            file,
+            cb
+        ) {
 
-    const userId = req.params.userId;
-
-    db.all(
-        `SELECT * FROM recipes WHERE user_id = ? ORDER BY id DESC`,
-        [userId],
-        (err, recipes) => {
-
-            if (err) {
-                return res.status(500).json({
-                    message: "Database error."
-                });
-            }
-
-            recipes.forEach(recipe => {
-
-                if (recipe.image) {
-
-                    if (
-                        recipe.image.startsWith("http://") ||
-                        recipe.image.startsWith("https://")
-                    ) {
-                        // Already a complete URL
-                    } else if (recipe.image.startsWith("/uploads/")) {
-
-                        recipe.image =
-                            `http://localhost:3000${recipe.image}`;
-
-                    } else {
-
-                        recipe.image =
-                            `http://localhost:3000/uploads/${recipe.image}`;
-                    }
-                }
-            });
-
-            res.json(recipes);
-        }
-    );
-});
+            const extension =
+                path.extname(
+                    file.originalname
+                );
 
 
-// Get one recipe
-router.get("/:id", (req, res) => {
+            const filename =
+                Date.now() +
+                "-" +
+                Math.round(
+                    Math.random() * 1E9
+                ) +
+                extension;
 
-    const recipeId = req.params.id;
 
-    db.get(
-        `SELECT * FROM recipes WHERE id = ?`,
-        [recipeId],
-        (err, recipe) => {
-
-            if (err) {
-                return res.status(500).json({
-                    message: "Database error."
-                });
-            }
-
-            if (!recipe) {
-                return res.status(404).json({
-                    message: "Recipe not found."
-                });
-            }
-
-            // Get ingredients
-            db.all(
-                `SELECT ingredient
-                 FROM ingredients
-                 WHERE recipe_id = ?
-                 ORDER BY rowid ASC`,
-                [recipeId],
-                (err, ingredients) => {
-
-                    if (err) {
-                        return res.status(500).json({
-                            message: "Database error."
-                        });
-                    }
-
-                    // Get instructions
-                    db.all(
-                        `SELECT instruction
-                         FROM instructions
-                         WHERE recipe_id = ?
-                         ORDER BY rowid ASC`,
-                        [recipeId],
-                        (err, instructions) => {
-
-                            if (err) {
-                                return res.status(500).json({
-                                    message: "Database error."
-                                });
-                            }
-
-                            recipe.ingredients = ingredients.map(
-                                item => item.ingredient
-                            );
-
-                            recipe.instructions = instructions.map(
-                                item => item.instruction
-                            );
-
-                            // Convert image to usable URL
-                            if (recipe.image) {
-
-                                if (
-                                    recipe.image.startsWith("http://") ||
-                                    recipe.image.startsWith("https://")
-                                ) {
-                                    // Already complete
-                                } else if (
-                                    recipe.image.startsWith("/uploads/")
-                                ) {
-
-                                    recipe.image =
-                                        `http://localhost:3000${recipe.image}`;
-
-                                } else {
-
-                                    recipe.image =
-                                        `http://localhost:3000/uploads/${recipe.image}`;
-                                }
-
-                            } else {
-
-                                recipe.image =
-                                    "images/placeholder.jpg";
-                            }
-
-                            res.json(recipe);
-                        }
-                    );
-                }
+            cb(
+                null,
+                filename
             );
         }
-    );
-});
+    });
 
 
-// Create recipe
-router.post("/", upload.single("image"), (req, res) => {
+// =====================================================
+// Multer Upload
+// =====================================================
 
-    const {
-        user_id,
-        title,
-        description,
-        category,
-        time,
-        servings,
-        difficulty,
-        calories,
-        protein,
-        carbs,
-        fat,
-        ingredients,
-        instructions
-    } = req.body;
+const upload =
+    multer({
 
+        storage: storage,
+
+        fileFilter:
+            function (
+                req,
+                file,
+                cb
+            ) {
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+
+                if (
+                    allowedTypes.includes(
+                        file.mimetype
+                    )
+                ) {
+
+                    cb(
+                        null,
+                        true
+                    );
+
+                } else {
+
+                    cb(
+                        new Error(
+                            "Only JPG, JPEG, PNG and WEBP images are allowed."
+                        )
+                    );
+                }
+            },
+
+
+        limits: {
+            fileSize:
+                5 * 1024 * 1024
+        }
+    });
+
+
+// =====================================================
+// Convert Database Image to URL
+// =====================================================
+
+function getImageUrl(image) {
+
+    if (!image) {
+        return null;
+    }
+
+
+    image =
+        String(image).trim();
+
+
+    if (image === "") {
+        return null;
+    }
+
+
+    // Already complete URL
     if (
-        !user_id ||
-        !title ||
-        !description ||
-        !time ||
-        !servings
+        image.startsWith("http://") ||
+        image.startsWith("https://")
     ) {
 
-        // Remove uploaded image if validation fails
-        if (req.file) {
-            fs.unlinkSync(req.file.path);
-        }
-
-        return res.status(400).json({
-            message: "Missing required fields."
-        });
+        return image;
     }
 
-    let image = null;
 
-    if (req.file) {
-        image = req.file.filename;
+    // If it contains /uploads/
+    if (
+        image.includes("/uploads/")
+    ) {
+
+        const filename =
+            image
+                .split("/uploads/")
+                .pop();
+
+
+        return (
+            "http://localhost:3000/uploads/" +
+            path.basename(filename)
+        );
     }
 
-    let ingredientArray = [];
 
-    let instructionArray = [];
+    // uploads/filename
+    if (
+        image.startsWith("uploads/")
+    ) {
 
-    try {
-
-        ingredientArray =
-            ingredients ? JSON.parse(ingredients) : [];
-
-    } catch (error) {
-
-        ingredientArray = [];
+        return (
+            "http://localhost:3000/" +
+            image
+        );
     }
 
-    try {
 
-        instructionArray =
-            instructions ? JSON.parse(instructions) : [];
+    // Filename only
+    return (
+        "http://localhost:3000/uploads/" +
+        path.basename(image)
+    );
+}
 
-    } catch (error) {
 
-        instructionArray = [];
+// =====================================================
+// Get User Recipes
+// =====================================================
+
+router.get(
+    "/user/:userId",
+    (req, res) => {
+
+        const userId =
+            req.params.userId;
+
+
+        db.all(
+            `
+            SELECT *
+            FROM recipes
+            WHERE user_id = ?
+            ORDER BY id DESC
+            `,
+            [userId],
+
+            (err, recipes) => {
+
+                if (err) {
+
+                    console.error(
+                        "Get user recipes error:",
+                        err
+                    );
+
+                    return res.status(500).json({
+                        message:
+                            "Database error."
+                    });
+                }
+
+
+                recipes.forEach(
+                    function (recipe) {
+
+                        recipe.image =
+                            getImageUrl(
+                                recipe.image
+                            );
+                    }
+                );
+
+
+                res.json(
+                    recipes
+                );
+            }
+        );
     }
+);
 
-    const sql = `
-        INSERT INTO recipes
-        (
+
+// =====================================================
+// Get One Recipe
+// =====================================================
+
+router.get(
+    "/:id",
+    (req, res) => {
+
+        const recipeId =
+            req.params.id;
+
+
+        db.get(
+            `
+            SELECT *
+            FROM recipes
+            WHERE id = ?
+            `,
+            [recipeId],
+
+            (err, recipe) => {
+
+                if (err) {
+
+                    console.error(
+                        "Get recipe error:",
+                        err
+                    );
+
+                    return res.status(500).json({
+                        message:
+                            "Database error."
+                    });
+                }
+
+
+                if (!recipe) {
+
+                    return res.status(404).json({
+                        message:
+                            "Recipe not found."
+                    });
+                }
+
+
+                // ===============================
+                // Ingredients
+                // ===============================
+
+                db.all(
+                    `
+                    SELECT ingredient
+                    FROM ingredients
+                    WHERE recipe_id = ?
+                    ORDER BY rowid ASC
+                    `,
+                    [recipeId],
+
+                    (err, ingredients) => {
+
+                        if (err) {
+
+                            console.error(
+                                "Get ingredients error:",
+                                err
+                            );
+
+                            return res.status(500).json({
+                                message:
+                                    "Database error."
+                            });
+                        }
+
+
+                        // ===============================
+                        // Instructions
+                        // ===============================
+
+                        db.all(
+                            `
+                            SELECT instruction
+                            FROM instructions
+                            WHERE recipe_id = ?
+                            ORDER BY rowid ASC
+                            `,
+                            [recipeId],
+
+                            (err, instructions) => {
+
+                                if (err) {
+
+                                    console.error(
+                                        "Get instructions error:",
+                                        err
+                                    );
+
+                                    return res.status(500).json({
+                                        message:
+                                            "Database error."
+                                    });
+                                }
+
+
+                                recipe.ingredients =
+                                    ingredients.map(
+                                        function (item) {
+
+                                            return item.ingredient;
+                                        }
+                                    );
+
+
+                                recipe.instructions =
+                                    instructions.map(
+                                        function (item) {
+
+                                            return item.instruction;
+                                        }
+                                    );
+
+
+                                // Convert image
+                                recipe.image =
+                                    getImageUrl(
+                                        recipe.image
+                                    );
+
+
+                                res.json(
+                                    recipe
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    }
+);
+
+
+// =====================================================
+// Create Recipe
+// =====================================================
+
+router.post(
+    "/",
+    upload.single("image"),
+    (req, res) => {
+
+        const {
             user_id,
             title,
             description,
@@ -274,173 +412,508 @@ router.post("/", upload.single("image"), (req, res) => {
             time,
             servings,
             difficulty,
-            image,
             calories,
             protein,
             carbs,
-            fat
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+            fat,
+            ingredients,
+            instructions
+        } = req.body;
 
-    db.run(
-        sql,
-        [
-            user_id,
-            title,
-            description,
-            category,
-            time,
-            servings,
-            difficulty || "Easy",
-            image,
-            Number(calories) || 0,
-            Number(protein) || 0,
-            Number(carbs) || 0,
-            Number(fat) || 0
-        ],
-        function (err) {
 
-            if (err) {
+        // ===============================
+        // Validation
+        // ===============================
 
-                // Delete uploaded image if database insert fails
-                if (req.file) {
-                    fs.unlinkSync(req.file.path);
-                }
+        if (
+            !user_id ||
+            !title ||
+            !description ||
+            !time ||
+            !servings
+        ) {
 
-                console.error("Create recipe database error:", err);
+            if (req.file) {
 
-                return res.status(500).json({
-                    message: "Could not create recipe."
-                });
-            }
-
-            const recipeId = this.lastID;
-
-            // Insert ingredients
-            if (ingredientArray.length > 0) {
-
-                const ingredientStmt = db.prepare(
-                    `INSERT INTO ingredients
-                     (recipe_id, ingredient)
-                     VALUES (?, ?)`
+                fs.unlink(
+                    req.file.path,
+                    function () {}
                 );
-
-                ingredientArray.forEach(ingredient => {
-
-                    if (ingredient.trim() !== "") {
-
-                        ingredientStmt.run(
-                            recipeId,
-                            ingredient.trim()
-                        );
-                    }
-                });
-
-                ingredientStmt.finalize();
             }
 
-            // Insert instructions
-            if (instructionArray.length > 0) {
 
-                const instructionStmt = db.prepare(
-                    `INSERT INTO instructions
-                     (recipe_id, instruction)
-                     VALUES (?, ?)`
-                );
-
-                instructionArray.forEach(instruction => {
-
-                    if (instruction.trim() !== "") {
-
-                        instructionStmt.run(
-                            recipeId,
-                            instruction.trim()
-                        );
-                    }
-                });
-
-                instructionStmt.finalize();
-            }
-
-            res.json({
-                message: "Recipe created successfully.",
-                recipeId: recipeId,
-                image: image
-                    ? `http://localhost:3000/uploads/${image}`
-                    : null
+            return res.status(400).json({
+                message:
+                    "Missing required fields."
             });
         }
-    );
-});
 
 
-// Delete recipe
-router.delete("/:id", (req, res) => {
+        // ===============================
+        // Image Filename
+        // ===============================
 
-    const recipeId = req.params.id;
+        let image = null;
 
-    // Get image before deleting recipe
-    db.get(
-        `SELECT image FROM recipes WHERE id = ?`,
-        [recipeId],
-        (err, recipe) => {
 
-            if (err) {
-                return res.status(500).json({
-                    message: "Database error."
-                });
-            }
+        if (req.file) {
 
-            // Delete ingredients
-            db.run(
-                `DELETE FROM ingredients WHERE recipe_id = ?`,
-                [recipeId]
+            image =
+                req.file.filename;
+        }
+
+
+        // ===============================
+        // Parse Ingredients
+        // ===============================
+
+        let ingredientArray = [];
+
+
+        try {
+
+            ingredientArray =
+                ingredients
+                    ? JSON.parse(ingredients)
+                    : [];
+
+        } catch (error) {
+
+            console.error(
+                "Ingredient JSON error:",
+                error
             );
 
-            // Delete instructions
-            db.run(
-                `DELETE FROM instructions WHERE recipe_id = ?`,
-                [recipeId]
+            ingredientArray = [];
+        }
+
+
+        // ===============================
+        // Parse Instructions
+        // ===============================
+
+        let instructionArray = [];
+
+
+        try {
+
+            instructionArray =
+                instructions
+                    ? JSON.parse(instructions)
+                    : [];
+
+        } catch (error) {
+
+            console.error(
+                "Instruction JSON error:",
+                error
             );
 
-            // Delete favourites
-            db.run(
-                `DELETE FROM favourites WHERE recipe_id = ?`,
-                [recipeId]
-            );
+            instructionArray = [];
+        }
 
-            // Delete recipe
-            db.run(
-                `DELETE FROM recipes WHERE id = ?`,
-                [recipeId],
-                function (err) {
 
-                    if (err) {
-                        return res.status(500).json({
-                            message: "Could not delete recipe."
-                        });
+        // ===============================
+        // Insert Recipe
+        // ===============================
+
+        const sql = `
+            INSERT INTO recipes
+            (
+                user_id,
+                title,
+                description,
+                category,
+                time,
+                servings,
+                difficulty,
+                image,
+                calories,
+                protein,
+                carbs,
+                fat
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+
+        db.run(
+            sql,
+
+            [
+                user_id,
+                title,
+                description,
+                category || "",
+                time,
+                servings,
+                difficulty || "Easy",
+                image,
+                Number(calories) || 0,
+                Number(protein) || 0,
+                Number(carbs) || 0,
+                Number(fat) || 0
+            ],
+
+            function (err) {
+
+                if (err) {
+
+                    console.error(
+                        "Create recipe database error:",
+                        err
+                    );
+
+
+                    if (req.file) {
+
+                        fs.unlink(
+                            req.file.path,
+                            function () {}
+                        );
                     }
 
-                    // Delete image file
-                    if (recipe && recipe.image) {
 
-                        const imagePath =
-                            path.join(uploadDir, recipe.image);
-
-                        if (fs.existsSync(imagePath)) {
-                            fs.unlinkSync(imagePath);
-                        }
-                    }
-
-                    res.json({
-                        message: "Recipe deleted successfully."
+                    return res.status(500).json({
+                        message:
+                            "Could not create recipe."
                     });
                 }
-            );
+
+
+                const recipeId =
+                    this.lastID;
+
+
+                // ===============================
+                // Insert Ingredients
+                // ===============================
+
+                if (
+                    Array.isArray(
+                        ingredientArray
+                    ) &&
+                    ingredientArray.length > 0
+                ) {
+
+                    const ingredientStmt =
+                        db.prepare(
+                            `
+                            INSERT INTO ingredients
+                            (
+                                recipe_id,
+                                ingredient
+                            )
+                            VALUES (?, ?)
+                            `
+                        );
+
+
+                    ingredientArray.forEach(
+                        function (ingredient) {
+
+                            if (
+                                typeof ingredient ===
+                                "string" &&
+                                ingredient.trim() !== ""
+                            ) {
+
+                                ingredientStmt.run(
+                                    recipeId,
+                                    ingredient.trim()
+                                );
+                            }
+                        }
+                    );
+
+
+                    ingredientStmt.finalize();
+                }
+
+
+                // ===============================
+                // Insert Instructions
+                // ===============================
+
+                if (
+                    Array.isArray(
+                        instructionArray
+                    ) &&
+                    instructionArray.length > 0
+                ) {
+
+                    const instructionStmt =
+                        db.prepare(
+                            `
+                            INSERT INTO instructions
+                            (
+                                recipe_id,
+                                instruction
+                            )
+                            VALUES (?, ?)
+                            `
+                        );
+
+
+                    instructionArray.forEach(
+                        function (instruction) {
+
+                            if (
+                                typeof instruction ===
+                                "string" &&
+                                instruction.trim() !== ""
+                            ) {
+
+                                instructionStmt.run(
+                                    recipeId,
+                                    instruction.trim()
+                                );
+                            }
+                        }
+                    );
+
+
+                    instructionStmt.finalize();
+                }
+
+
+                // ===============================
+                // Response
+                // ===============================
+
+                res.status(201).json({
+
+                    message:
+                        "Recipe created successfully.",
+
+                    recipeId:
+                        recipeId,
+
+                    image:
+                        getImageUrl(
+                            image
+                        )
+                });
+            }
+        );
+    }
+);
+
+
+// =====================================================
+// Delete Recipe
+// =====================================================
+
+router.delete(
+    "/:id",
+    (req, res) => {
+
+        const recipeId =
+            req.params.id;
+
+
+        // ===============================
+        // Get Image
+        // ===============================
+
+        db.get(
+            `
+            SELECT image
+            FROM recipes
+            WHERE id = ?
+            `,
+            [recipeId],
+
+            (err, recipe) => {
+
+                if (err) {
+
+                    return res.status(500).json({
+                        message:
+                            "Database error."
+                    });
+                }
+
+
+                // ===============================
+                // Delete Ingredients
+                // ===============================
+
+                db.run(
+                    `
+                    DELETE FROM ingredients
+                    WHERE recipe_id = ?
+                    `,
+                    [recipeId]
+                );
+
+
+                // ===============================
+                // Delete Instructions
+                // ===============================
+
+                db.run(
+                    `
+                    DELETE FROM instructions
+                    WHERE recipe_id = ?
+                    `,
+                    [recipeId]
+                );
+
+
+                // ===============================
+                // Delete Favourites
+                // ===============================
+
+                db.run(
+                    `
+                    DELETE FROM favourites
+                    WHERE recipe_id = ?
+                    `,
+                    [recipeId]
+                );
+
+
+                // ===============================
+                // Delete Recipe
+                // ===============================
+
+                db.run(
+                    `
+                    DELETE FROM recipes
+                    WHERE id = ?
+                    `,
+                    [recipeId],
+
+                    function (err) {
+
+                        if (err) {
+
+                            return res.status(500).json({
+                                message:
+                                    "Could not delete recipe."
+                            });
+                        }
+
+
+                        // ===============================
+                        // Delete Image
+                        // ===============================
+
+                        if (
+                            recipe &&
+                            recipe.image
+                        ) {
+
+                            let filename =
+                                recipe.image;
+
+
+                            if (
+                                filename.includes(
+                                    "/uploads/"
+                                )
+                            ) {
+
+                                filename =
+                                    filename
+                                        .split(
+                                            "/uploads/"
+                                        )
+                                        .pop();
+                            }
+
+
+                            filename =
+                                path.basename(
+                                    filename
+                                );
+
+
+                            const imagePath =
+                                path.join(
+                                    uploadDir,
+                                    filename
+                                );
+
+
+                            if (
+                                fs.existsSync(
+                                    imagePath
+                                )
+                            ) {
+
+                                fs.unlink(
+                                    imagePath,
+                                    function (error) {
+
+                                        if (error) {
+
+                                            console.error(
+                                                "Could not delete image:",
+                                                error
+                                            );
+                                        }
+                                    }
+                                );
+                            }
+                        }
+
+
+                        res.json({
+                            message:
+                                "Recipe deleted successfully."
+                        });
+                    }
+                );
+            }
+        );
+    }
+);
+
+
+// =====================================================
+// Multer Error Handler
+// =====================================================
+
+router.use(
+    function (
+        error,
+        req,
+        res,
+        next
+    ) {
+
+        if (
+            error instanceof multer.MulterError
+        ) {
+
+            return res.status(400).json({
+                message:
+                    error.message
+            });
         }
-    );
-});
+
+
+        if (error) {
+
+            console.error(
+                "Recipe upload error:",
+                error
+            );
+
+
+            return res.status(400).json({
+                message:
+                    error.message ||
+                    "Image upload failed."
+            });
+        }
+
+
+        next();
+    }
+);
 
 
 module.exports = router;

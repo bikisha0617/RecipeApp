@@ -129,6 +129,10 @@ if (recipeForm) {
 
             e.preventDefault();
 
+            // ===============================
+            // Get Values
+            // ===============================
+
             const title =
                 document.getElementById("title").value.trim();
 
@@ -157,24 +161,37 @@ if (recipeForm) {
                     ? difficultyElement.value
                     : "Easy";
 
+            const caloriesElement =
+                document.getElementById("calories");
+
+            const proteinElement =
+                document.getElementById("protein");
+
+            const carbsElement =
+                document.getElementById("carbs");
+
+            const fatElement =
+                document.getElementById("fat");
+
+
             const calories =
-                document.getElementById("calories")
-                    ? document.getElementById("calories").value
+                caloriesElement
+                    ? caloriesElement.value
                     : 0;
 
             const protein =
-                document.getElementById("protein")
-                    ? document.getElementById("protein").value
+                proteinElement
+                    ? proteinElement.value
                     : 0;
 
             const carbs =
-                document.getElementById("carbs")
-                    ? document.getElementById("carbs").value
+                carbsElement
+                    ? carbsElement.value
                     : 0;
 
             const fat =
-                document.getElementById("fat")
-                    ? document.getElementById("fat").value
+                fatElement
+                    ? fatElement.value
                     : 0;
 
 
@@ -189,7 +206,9 @@ if (recipeForm) {
                 servings === ""
             ) {
 
-                alert("Please fill in all required fields.");
+                alert(
+                    "Please fill in all required fields."
+                );
 
                 return;
             }
@@ -204,9 +223,12 @@ if (recipeForm) {
 
             if (!userId) {
 
-                alert("Please login before creating a recipe.");
+                alert(
+                    "Please login before creating a recipe."
+                );
 
-                window.location.href = "login.html";
+                window.location.href =
+                    "login.html";
 
                 return;
             }
@@ -251,10 +273,11 @@ if (recipeForm) {
 
 
             // ===============================
-            // Create FormData
+            // FormData
             // ===============================
 
-            const formData = new FormData();
+            const formData =
+                new FormData();
 
             formData.append(
                 "user_id",
@@ -326,7 +349,11 @@ if (recipeForm) {
             // Image
             // ===============================
 
-            if (imageInput && imageInput.files.length > 0) {
+            if (
+                imageInput &&
+                imageInput.files &&
+                imageInput.files.length > 0
+            ) {
 
                 formData.append(
                     "image",
@@ -341,13 +368,14 @@ if (recipeForm) {
 
             try {
 
-                const response = await fetch(
-                    "http://localhost:3000/api/recipes",
-                    {
-                        method: "POST",
-                        body: formData
-                    }
-                );
+                const response =
+                    await fetch(
+                        "http://localhost:3000/api/recipes",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
 
 
                 const data =
@@ -355,6 +383,11 @@ if (recipeForm) {
 
 
                 if (!response.ok) {
+
+                    console.error(
+                        "Create recipe error:",
+                        data
+                    );
 
                     alert(
                         data.message ||
