@@ -1,6 +1,37 @@
 const express = require("express");
 const router = express.Router();
+
 const db = require("../database");
+
+// Get all recipes
+router.get("/", (req, res) => {
+
+    const sql = `
+        SELECT
+            recipes.*,
+            users.name AS author
+        FROM recipes
+        LEFT JOIN users
+        ON recipes.user_id = users.id
+        ORDER BY recipes.id ASC
+    `;
+
+    db.all(sql, [], (err, recipes) => {
+
+        if (err) {
+            return res.status(500).json({
+                message: "Database error."
+            });
+        }
+
+        recipes.forEach(recipe => {
+            recipe.ingredients = [];
+            recipe.instructions = [];
+        });
+
+        res.json(recipes);
+    });
+});
 
 
 // Get recipes created by a user
@@ -9,7 +40,16 @@ router.get("/user/:userId", (req, res) => {
     const userId = req.params.userId;
 
     db.all(
-        `SELECT * FROM recipes WHERE user_id = ? ORDER BY id DESC`,
+        `
+        SELECT
+            recipes.*,
+            users.name AS author
+        FROM recipes
+        LEFT JOIN users
+        ON recipes.user_id = users.id
+        WHERE recipes.user_id = ?
+        ORDER BY recipes.id DESC
+        `,
         [userId],
         (err, recipes) => {
 
@@ -31,7 +71,15 @@ router.get("/:id", (req, res) => {
     const recipeId = req.params.id;
 
     db.get(
-        `SELECT * FROM recipes WHERE id = ?`,
+        `
+        SELECT
+            recipes.*,
+            users.name AS author
+        FROM recipes
+        LEFT JOIN users
+        ON recipes.user_id = users.id
+        WHERE recipes.id = ?
+        `,
         [recipeId],
         (err, recipe) => {
 
@@ -47,8 +95,14 @@ router.get("/:id", (req, res) => {
                 });
             }
 
+            // Get ingredients
             db.all(
-                `SELECT ingredient FROM ingredients WHERE recipe_id = ?`,
+                `
+                SELECT ingredient
+                FROM ingredients
+                WHERE recipe_id = ?
+                ORDER BY id ASC
+                `,
                 [recipeId],
                 (err, ingredients) => {
 
@@ -58,8 +112,14 @@ router.get("/:id", (req, res) => {
                         });
                     }
 
+                    // Get instructions
                     db.all(
-                        `SELECT instruction FROM instructions WHERE recipe_id = ?`,
+                        `
+                        SELECT instruction
+                        FROM instructions
+                        WHERE recipe_id = ?
+                        ORDER BY id ASC
+                        `,
                         [recipeId],
                         (err, instructions) => {
 
@@ -116,7 +176,15 @@ router.post("/", (req, res) => {
 
     const sql = `
         INSERT INTO recipes
-        (user_id, title, description, category, time, servings, image)
+        (
+            user_id,
+            title,
+            description,
+            category,
+            time,
+            servings,
+            image
+        )
         VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -126,14 +194,16 @@ router.post("/", (req, res) => {
             user_id,
             title,
             description,
-            category,
+            category || "",
             time,
             servings,
-            image
+            image || "images/recipes/default.jpg"
         ],
-        function(err) {
+        function (err) {
 
             if (err) {
+                console.error(err);
+
                 return res.status(500).json({
                     message: "Could not create recipe."
                 });
@@ -141,12 +211,15 @@ router.post("/", (req, res) => {
 
             const recipeId = this.lastID;
 
-            if (ingredients && ingredients.length > 0) {
+            // Save ingredients
+            if (Array.isArray(ingredients) && ingredients.length > 0) {
 
                 const ingredientStmt = db.prepare(
-                    `INSERT INTO ingredients
-                     (recipe_id, ingredient)
-                     VALUES (?, ?)`
+                    `
+                    INSERT INTO ingredients
+                    (recipe_id, ingredient)
+                    VALUES (?, ?)
+                    `
                 );
 
                 ingredients.forEach(ingredient => {
@@ -156,12 +229,15 @@ router.post("/", (req, res) => {
                 ingredientStmt.finalize();
             }
 
-            if (instructions && instructions.length > 0) {
+            // Save instructions
+            if (Array.isArray(instructions) && instructions.length > 0) {
 
                 const instructionStmt = db.prepare(
-                    `INSERT INTO instructions
-                     (recipe_id, instruction)
-                     VALUES (?, ?)`
+                    `
+                    INSERT INTO instructions
+                    (recipe_id, instruction)
+                    VALUES (?, ?)
+                    `
                 );
 
                 instructions.forEach(instruction => {
@@ -173,7 +249,7 @@ router.post("/", (req, res) => {
 
             res.json({
                 message: "Recipe created successfully.",
-                recipeId
+                recipeId: recipeId
             });
         }
     );
@@ -185,24 +261,39 @@ router.delete("/:id", (req, res) => {
 
     const recipeId = req.params.id;
 
+    // Delete ingredients
     db.run(
         `DELETE FROM ingredients WHERE recipe_id = ?`,
         [recipeId]
     );
 
+    // Delete instructions
     db.run(
         `DELETE FROM instructions WHERE recipe_id = ?`,
         [recipeId]
     );
 
+    // Delete favourites
+    db.run(
+        `DELETE FROM favourites WHERE recipe_id = ?`,
+        [recipeId]
+    );
+
+    // Delete recipe
     db.run(
         `DELETE FROM recipes WHERE id = ?`,
         [recipeId],
-        function(err) {
+        function (err) {
 
             if (err) {
                 return res.status(500).json({
                     message: "Could not delete recipe."
+                });
+            }
+
+            if (this.changes === 0) {
+                return res.status(404).json({
+                    message: "Recipe not found."
                 });
             }
 
