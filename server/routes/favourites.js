@@ -20,48 +20,19 @@ router.get("/:userId", (req, res) => {
     db.all(sql, [userId], (err, recipes) => {
 
         if (err) {
+
+            console.error(
+                "Get favourites error:",
+                err
+            );
+
             return res.status(500).json({
                 message: "Database error."
             });
         }
 
-        // Add author name
-        let completed = 0;
-
-        if (recipes.length === 0) {
-            return res.json([]);
-        }
-
-        recipes.forEach(function (recipe) {
-
-            db.get(
-                `
-                SELECT name
-                FROM users
-                WHERE id = ?
-                `,
-                [recipe.user_id],
-                function (err, user) {
-
-                    if (!err && user) {
-                        recipe.author = user.name;
-                    } else {
-                        recipe.author = "Unknown";
-                    }
-
-                    completed++;
-
-                    if (completed === recipes.length) {
-                        res.json(recipes);
-                    }
-
-                }
-            );
-
-        });
-
+        res.json(recipes);
     });
-
 });
 
 
@@ -74,59 +45,68 @@ router.post("/", (req, res) => {
     } = req.body;
 
     if (!user_id || !recipe_id) {
+
         return res.status(400).json({
-            message: "Missing user or recipe."
+            message: "User ID and recipe ID are required."
         });
     }
 
-    // Check if already favourite
+
+    // Check recipe exists
     db.get(
-        `
-        SELECT id
-        FROM favourites
-        WHERE user_id = ?
-        AND recipe_id = ?
-        `,
-        [user_id, recipe_id],
-        (err, favourite) => {
+        `SELECT id FROM recipes WHERE id = ?`,
+        [recipe_id],
+        (err, recipe) => {
 
             if (err) {
+
                 return res.status(500).json({
                     message: "Database error."
                 });
             }
 
-            if (favourite) {
-                return res.json({
-                    message: "Recipe is already a favourite."
+            if (!recipe) {
+
+                return res.status(404).json({
+                    message: "Recipe not found."
                 });
             }
 
+
+            // Add favourite
             db.run(
                 `
-                INSERT INTO favourites
+                INSERT OR IGNORE INTO favourites
                 (user_id, recipe_id)
                 VALUES (?, ?)
                 `,
-                [user_id, recipe_id],
+                [
+                    user_id,
+                    recipe_id
+                ],
                 function (err) {
 
                     if (err) {
+
+                        console.error(
+                            "Add favourite error:",
+                            err
+                        );
+
                         return res.status(500).json({
-                            message: "Could not add favourite."
+                            message:
+                                "Could not add favourite."
                         });
                     }
 
                     res.json({
-                        message: "Recipe added to favourites."
+                        message:
+                            "Recipe added to favourites."
                     });
-
                 }
             );
-
         }
     );
-
 });
 
 
@@ -139,43 +119,13 @@ router.delete("/", (req, res) => {
     } = req.body;
 
     if (!user_id || !recipe_id) {
+
         return res.status(400).json({
-            message: "Missing user or recipe."
+            message:
+                "User ID and recipe ID are required."
         });
     }
 
-    db.run(
-        `
-        DELETE FROM favourites
-        WHERE user_id = ?
-        AND recipe_id = ?
-        `,
-        [user_id, recipe_id],
-        function (err) {
-
-            if (err) {
-                return res.status(500).json({
-                    message: "Could not remove favourite."
-                });
-            }
-
-            res.json({
-                message: "Recipe removed from favourites."
-            });
-
-        }
-    );
-
-});
-
-
-// Remove favourite using URL parameters
-router.delete("/:userId/:recipeId", (req, res) => {
-
-    const {
-        userId,
-        recipeId
-    } = req.params;
 
     db.run(
         `
@@ -183,22 +133,31 @@ router.delete("/:userId/:recipeId", (req, res) => {
         WHERE user_id = ?
         AND recipe_id = ?
         `,
-        [userId, recipeId],
+        [
+            user_id,
+            recipe_id
+        ],
         function (err) {
 
             if (err) {
+
+                console.error(
+                    "Remove favourite error:",
+                    err
+                );
+
                 return res.status(500).json({
-                    message: "Could not remove favourite."
+                    message:
+                        "Could not remove favourite."
                 });
             }
 
             res.json({
-                message: "Recipe removed from favourites."
+                message:
+                    "Recipe removed from favourites."
             });
-
         }
     );
-
 });
 
 
