@@ -1,13 +1,23 @@
-// Image
+// ===============================
+// Image Preview
+// ===============================
+
 const imageInput = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 
 if (imageInput) {
+
     imageInput.addEventListener("change", function () {
+
         const file = this.files[0];
+
         if (file) {
+
             preview.src = URL.createObjectURL(file);
-            const overlay = document.querySelector(".upload-overlay");
+
+            const overlay =
+                document.querySelector(".upload-overlay");
+
             if (overlay) {
                 overlay.style.opacity = "0";
             }
@@ -15,130 +25,372 @@ if (imageInput) {
     });
 }
 
-// Add Ingredient
 
-const ingredientList = document.getElementById("ingredientList");
-const addIngredient = document.getElementById("addIngredient");
+// ===============================
+// Add Ingredient
+// ===============================
+
+const ingredientList =
+    document.getElementById("ingredientList");
+
+const addIngredient =
+    document.getElementById("addIngredient");
 
 if (addIngredient) {
+
     addIngredient.addEventListener("click", function () {
+
         const div = document.createElement("div");
+
         div.className = "ingredient-row";
+
         div.innerHTML = `
-            <input type="text" class="ingredient" placeholder="Ingredient">
-            <button type="button" class="remove-btn">✕</button>
+            <input
+                type="text"
+                class="ingredient"
+                placeholder="Ingredient"
+            >
+
+            <button
+                type="button"
+                class="remove-btn"
+            >
+                ✕
+            </button>
         `;
+
         ingredientList.appendChild(div);
     });
 }
 
-// Add step
 
-const stepList = document.getElementById("stepList");
-const addStep = document.getElementById("addStep");
+// ===============================
+// Add Step
+// ===============================
+
+const stepList =
+    document.getElementById("stepList");
+
+const addStep =
+    document.getElementById("addStep");
 
 if (addStep) {
+
     addStep.addEventListener("click", function () {
+
         const div = document.createElement("div");
+
         div.className = "step-row";
+
         div.innerHTML = `
-            <textarea class="step" placeholder="Write a step."></textarea>
-            <button type="button" class="remove-btn">✕</button>
+            <textarea
+                class="step"
+                placeholder="Write a step."
+            ></textarea>
+
+            <button
+                type="button"
+                class="remove-btn"
+            >
+                ✕
+            </button>
         `;
+
         stepList.appendChild(div);
     });
 }
 
-// Remove
+
+// ===============================
+// Remove Ingredient / Step
+// ===============================
 
 document.addEventListener("click", function (e) {
+
     if (e.target.classList.contains("remove-btn")) {
+
         e.target.parentElement.remove();
     }
 });
 
-// Publish Recipe
 
-const recipeForm = document.getElementById("recipeForm");
+// ===============================
+// Publish Recipe
+// ===============================
+
+const recipeForm =
+    document.getElementById("recipeForm");
 
 if (recipeForm) {
-    recipeForm.addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const title = document.getElementById("title").value.trim();
-        const description = document.getElementById("description").value.trim();
-        const category = document.getElementById("category").value;
-        const time = document.getElementById("time").value.trim();
-        const servings = document.getElementById("servings").value;
 
-        if (
-            title === "" ||
-            description === "" ||
-            time === "" ||
-            servings === ""
-        ) {
-            alert("Please fill in all required fields.");
-            return;
-        }
+    recipeForm.addEventListener(
+        "submit",
+        async function (e) {
 
-        const userId = localStorage.getItem("userId");
+            e.preventDefault();
 
-        if (!userId) {
-            alert("Please login before creating a recipe.");
-            window.location.href = "login.html";
-            return;
-        }
+            const title =
+                document.getElementById("title").value.trim();
 
-        const ingredients = [];
+            const description =
+                document.getElementById("description").value.trim();
 
-        document.querySelectorAll(".ingredient").forEach(function (item) {
-                const value = item.value.trim();
-                if (value !== "") {
-                    ingredients.push(value);
-                }
-            });
+            const categoryElement =
+                document.getElementById("category");
 
-        const instructions = [];
+            const category =
+                categoryElement
+                    ? categoryElement.value
+                    : "";
 
-        document.querySelectorAll(".step").forEach(function (item) {
-                const value = item.value.trim();
-                if (value !== "") {
-                    instructions.push(value);
-                }
-            });
+            const time =
+                document.getElementById("time").value.trim();
 
-        try {
-            const response = await fetch("http://localhost:3000/api/recipes",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        user_id: Number(userId),
-                        title: title,
-                        description: description,
-                        category: category,
-                        time: time,
-                        servings: servings,
-                        ingredients: ingredients,
-                        instructions: instructions
-                    })
-                }
-            );
+            const servings =
+                document.getElementById("servings").value.trim();
 
-            const data = await response.json();
+            const difficultyElement =
+                document.getElementById("difficulty");
 
-            if (!response.ok) {
-                alert(data.message || "Could not publish recipe.");
+            const difficulty =
+                difficultyElement
+                    ? difficultyElement.value
+                    : "Easy";
+
+            const calories =
+                document.getElementById("calories")
+                    ? document.getElementById("calories").value
+                    : 0;
+
+            const protein =
+                document.getElementById("protein")
+                    ? document.getElementById("protein").value
+                    : 0;
+
+            const carbs =
+                document.getElementById("carbs")
+                    ? document.getElementById("carbs").value
+                    : 0;
+
+            const fat =
+                document.getElementById("fat")
+                    ? document.getElementById("fat").value
+                    : 0;
+
+
+            // ===============================
+            // Validation
+            // ===============================
+
+            if (
+                title === "" ||
+                description === "" ||
+                time === "" ||
+                servings === ""
+            ) {
+
+                alert("Please fill in all required fields.");
+
                 return;
             }
-            alert("Recipe published successfully!");
-            window.location.href = "myrecipes.html";
-        } catch (error) {
-            console.error("Publish recipe error:", error);
-            alert(
-                "Could not connect to the server."
+
+
+            // ===============================
+            // Login Check
+            // ===============================
+
+            const userId =
+                localStorage.getItem("userId");
+
+            if (!userId) {
+
+                alert("Please login before creating a recipe.");
+
+                window.location.href = "login.html";
+
+                return;
+            }
+
+
+            // ===============================
+            // Ingredients
+            // ===============================
+
+            const ingredients = [];
+
+            document
+                .querySelectorAll(".ingredient")
+                .forEach(function (item) {
+
+                    const value =
+                        item.value.trim();
+
+                    if (value !== "") {
+                        ingredients.push(value);
+                    }
+                });
+
+
+            // ===============================
+            // Instructions
+            // ===============================
+
+            const instructions = [];
+
+            document
+                .querySelectorAll(".step")
+                .forEach(function (item) {
+
+                    const value =
+                        item.value.trim();
+
+                    if (value !== "") {
+                        instructions.push(value);
+                    }
+                });
+
+
+            // ===============================
+            // Create FormData
+            // ===============================
+
+            const formData = new FormData();
+
+            formData.append(
+                "user_id",
+                userId
             );
+
+            formData.append(
+                "title",
+                title
+            );
+
+            formData.append(
+                "description",
+                description
+            );
+
+            formData.append(
+                "category",
+                category
+            );
+
+            formData.append(
+                "time",
+                time
+            );
+
+            formData.append(
+                "servings",
+                servings
+            );
+
+            formData.append(
+                "difficulty",
+                difficulty
+            );
+
+            formData.append(
+                "calories",
+                calories
+            );
+
+            formData.append(
+                "protein",
+                protein
+            );
+
+            formData.append(
+                "carbs",
+                carbs
+            );
+
+            formData.append(
+                "fat",
+                fat
+            );
+
+            formData.append(
+                "ingredients",
+                JSON.stringify(ingredients)
+            );
+
+            formData.append(
+                "instructions",
+                JSON.stringify(instructions)
+            );
+
+
+            // ===============================
+            // Image
+            // ===============================
+
+            if (imageInput && imageInput.files.length > 0) {
+
+                formData.append(
+                    "image",
+                    imageInput.files[0]
+                );
+            }
+
+
+            // ===============================
+            // Send to Server
+            // ===============================
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:3000/api/recipes",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    alert(
+                        data.message ||
+                        "Could not create recipe."
+                    );
+
+                    return;
+                }
+
+
+                console.log(
+                    "Recipe created:",
+                    data
+                );
+
+
+                alert(
+                    "Recipe published successfully!"
+                );
+
+
+                window.location.href =
+                    "myrecipes.html";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Publish recipe error:",
+                    error
+                );
+
+                alert(
+                    "Could not connect to the server."
+                );
+            }
         }
-    });
+    );
 }

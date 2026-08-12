@@ -1,7 +1,11 @@
-const favouriteGrid = document.getElementById("favouriteGrid");
-const searchInput = document.getElementById("searchFavourite");
+const favouriteGrid =
+    document.getElementById("favouriteGrid");
 
-const userId = localStorage.getItem("userId");
+const searchInput =
+    document.getElementById("searchFavourite");
+
+const userId =
+    localStorage.getItem("userId");
 
 let favouriteRecipes = [];
 
@@ -12,14 +16,16 @@ if (!userId) {
     favouriteGrid.innerHTML = `
         <div class="empty-state">
             <h2>Please log in first</h2>
-            <a href="login.html">Login</a>
+
+            <a href="login.html">
+                Login
+            </a>
         </div>
     `;
 
 } else {
 
     loadFavourites();
-
 }
 
 
@@ -28,54 +34,43 @@ async function loadFavourites() {
 
     try {
 
-        // Get server favourites
         const response = await fetch(
             `http://localhost:3000/api/favourites/${userId}`
         );
 
-        let serverFavourites = [];
+        const data = await response.json();
 
-        if (response.ok) {
-            serverFavourites = await response.json();
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Could not load favourites."
+            );
+
+            return;
         }
 
-
-        // Get default recipe favourites
-        const localFavouriteIds =
-            JSON.parse(
-                localStorage.getItem("favourites")
-            ) || [];
-
-
-        const localFavourites =
-            recipes.filter(function (recipe) {
-
-                return localFavouriteIds.includes(recipe.id);
-
-            });
-
-
-        // Combine both
-        favouriteRecipes = [
-            ...localFavourites,
-            ...serverFavourites
-        ];
-
+        favouriteRecipes = data;
 
         displayRecipes(favouriteRecipes);
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Load favourites error:",
+            error
+        );
 
         favouriteGrid.innerHTML = `
             <div class="empty-state">
-                <h2>Could not connect to server</h2>
+
+                <h2>
+                    Could not connect to server
+                </h2>
+
             </div>
         `;
-
     }
-
 }
 
 
@@ -84,12 +79,20 @@ function displayRecipes(recipeList) {
 
     favouriteGrid.innerHTML = "";
 
+
     if (recipeList.length === 0) {
 
         favouriteGrid.innerHTML = `
             <div class="empty-state">
-                <h2>No favourites yet</h2>
-                <a href="index.html">Explore</a>
+
+                <h2>
+                    No favourites yet
+                </h2>
+
+                <a href="index.html">
+                    Explore
+                </a>
+
             </div>
         `;
 
@@ -99,21 +102,36 @@ function displayRecipes(recipeList) {
 
     recipeList.forEach(function (recipe) {
 
+        const image =
+            recipe.image ||
+            "images/recipes/default.jpg";
+
+
         favouriteGrid.innerHTML += `
             <div class="recipe-card">
 
                 <a href="recipe.html?id=${recipe.id}">
+
                     <img
-                        src="${recipe.image || "images/recipes/default.jpg"}"
+                        src="${image}"
                         alt="${recipe.title}"
+                        class="recipe-image"
+                        onerror="this.src='images/recipes/default.jpg';"
                     >
+
                 </a>
+
 
                 <div class="recipe-content">
 
-                    <h3>${recipe.title}</h3>
+                    <h3>
+                        ${recipe.title}
+                    </h3>
 
-                    <p>${recipe.time || ""}</p>
+                    <p>
+                        ${recipe.time || "-"}
+                    </p>
+
 
                     <div class="buttons">
 
@@ -124,9 +142,10 @@ function displayRecipes(recipeList) {
                             View
                         </button>
 
+
                         <button
                             class="remove-btn"
-                            onclick="removeFavourite(${recipe.id}, ${recipe.user_id ? "true" : "false"})"
+                            onclick="removeFavourite(${recipe.id})"
                         >
                             Remove
                         </button>
@@ -137,91 +156,65 @@ function displayRecipes(recipeList) {
 
             </div>
         `;
-
     });
-
 }
 
 
 // Search
 if (searchInput) {
 
-    searchInput.addEventListener("keyup", function () {
+    searchInput.addEventListener(
+        "keyup",
+        function () {
 
-        const keyword =
-            this.value.toLowerCase().trim();
-
-        const filtered =
-            favouriteRecipes.filter(function (recipe) {
-
-                return recipe.title
+            const keyword =
+                this.value
                     .toLowerCase()
-                    .includes(keyword);
+                    .trim();
 
-            });
 
-        displayRecipes(filtered);
+            const filtered =
+                favouriteRecipes.filter(
+                    function (recipe) {
 
-    });
+                        return recipe.title
+                            .toLowerCase()
+                            .includes(keyword);
+                    }
+                );
 
+
+            displayRecipes(filtered);
+        }
+    );
 }
 
 
 // Remove favourite
-async function removeFavourite(recipeId, isServerRecipe) {
+async function removeFavourite(recipeId) {
 
     try {
 
-        // Default recipe
-        if (!isServerRecipe) {
-
-            let favourites =
-                JSON.parse(
-                    localStorage.getItem("favourites")
-                ) || [];
-
-            favourites =
-                favourites.filter(function (id) {
-
-                    return id !== recipeId;
-
-                });
-
-            localStorage.setItem(
-                "favourites",
-                JSON.stringify(favourites)
-            );
-
-            favouriteRecipes =
-                favouriteRecipes.filter(function (recipe) {
-
-                    return recipe.id !== recipeId;
-
-                });
-
-            displayRecipes(favouriteRecipes);
-
-            return;
-        }
-
-
-        // User-created recipe
         const response = await fetch(
             "http://localhost:3000/api/favourites",
             {
                 method: "DELETE",
+
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type":
+                        "application/json"
                 },
+
                 body: JSON.stringify({
                     user_id: Number(userId),
-                    recipe_id: recipeId
+                    recipe_id: Number(recipeId)
                 })
             }
         );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!response.ok) {
@@ -236,24 +229,28 @@ async function removeFavourite(recipeId, isServerRecipe) {
 
 
         favouriteRecipes =
-            favouriteRecipes.filter(function (recipe) {
+            favouriteRecipes.filter(
+                function (recipe) {
 
-                return recipe.id !== recipeId;
-
-            });
+                    return Number(recipe.id) !==
+                        Number(recipeId);
+                }
+            );
 
 
         displayRecipes(favouriteRecipes);
 
-
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Remove favourite error:",
+            error
+        );
 
-        alert("Could not connect to server.");
-
+        alert(
+            "Could not connect to server."
+        );
     }
-
 }
 
 
@@ -262,5 +259,4 @@ function viewRecipe(id) {
 
     window.location.href =
         "recipe.html?id=" + id;
-
 }
