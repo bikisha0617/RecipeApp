@@ -1,15 +1,13 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../database");
 
-const User = sequelize.define(
-    "User",
+const User = sequelize.define("User",
     {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-
         name: {
             type: DataTypes.STRING(100),
             allowNull: false,
@@ -23,7 +21,6 @@ const User = sequelize.define(
                 }
             }
         },
-
         email: {
             type: DataTypes.STRING(150),
             allowNull: false,
@@ -37,18 +34,15 @@ const User = sequelize.define(
                 }
             }
         },
-
         password: {
             type: DataTypes.STRING,
             allowNull: false
         },
-
         notifications: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
         },
-
         darkMode: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
@@ -60,5 +54,4 @@ const User = sequelize.define(
         timestamps: false
     }
 );
-
 module.exports = User;

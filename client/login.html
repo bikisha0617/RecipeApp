@@ -1,146 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="css/login.css"
-    >
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
-
 <body>
-
     <div class="login-container">
-
         <div class="login-box">
-
             <h1>Login</h1>
-
-            <p class="subtitle">
-                Login to your account to continue
-            </p>
-
+            <p class="subtitle">Login to your account to continue</p>
 
             <!-- LOGIN FORM -->
-
             <form id="loginForm">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email" required>
+                
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
 
-                <label for="email">
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    autocomplete="email"
-                    required
-                >
-
-
-                <label for="password">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    autocomplete="current-password"
-                    required
-                >
-
-
-                <button
-                    type="submit"
-                    class="login-btn"
-                >
-                    Login
-                </button>
-
+                <button type="submit" class="login-btn">Login</button>
             </form>
-
-
             <!-- DIVIDER -->
-
             <div class="divider">
                 <span>OR</span>
             </div>
 
-
             <!-- SOCIAL BUTTONS -->
-
             <div class="social-buttons">
-
-                <button
-                    type="button"
-                    class="social-btn google"
-                    aria-label="Login with Google"
-                >
-
-                    <img
-                        src="images/icons/google.png"
-                        alt="Google"
-                    >
-
+                <button type="button" class="social-btn google" aria-label="Login with Google">
+                    <img src="images/icons/google.png" alt="Google">
                 </button>
-
-
-                <button
-                    type="button"
-                    class="social-btn apple"
-                    aria-label="Login with Apple"
-                >
-
-                    <img
-                        src="images/icons/apple.png"
-                        alt="Apple"
-                    >
-
+                <button type="button" class="social-btn apple" aria-label="Login with Apple">
+                    <img src="images/icons/apple.png" alt="Apple">
                 </button>
-
             </div>
 
-
             <!-- SIGNUP LINK -->
-
             <p class="signup">
-
                 Don't have an account?
-
-                <a href="signup.html">
-                    Sign Up
-                </a>
-
+                <a href="signup.html">Sign Up</a>
             </p>
-
         </div>
-
     </div>
 
-
-    <!-- JAVASCRIPT -->
-
     <script src="js/api.js"></script>
-
     <script src="js/login.js"></script>
-
 </body>
-
 </html>

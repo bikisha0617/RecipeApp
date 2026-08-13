@@ -1,21 +1,18 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../database");
 
-const Recipe = sequelize.define(
-    "Recipe",
+const Recipe = sequelize.define("Recipe",
     {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-
         userId: {
             type: DataTypes.INTEGER,
             allowNull: true,
             field: "user_id"
         },
-
         title: {
             type: DataTypes.STRING(200),
             allowNull: false,
@@ -29,27 +26,22 @@ const Recipe = sequelize.define(
                 }
             }
         },
-
         description: {
             type: DataTypes.TEXT,
             allowNull: true
         },
-
         category: {
             type: DataTypes.STRING(100),
             allowNull: true
         },
-
         time: {
             type: DataTypes.STRING(50),
             allowNull: true
         },
-
         servings: {
             type: DataTypes.STRING(50),
             allowNull: true
         },
-
         difficulty: {
             type: DataTypes.ENUM(
                 "Easy",
@@ -59,12 +51,10 @@ const Recipe = sequelize.define(
             allowNull: false,
             defaultValue: "Easy"
         },
-
         image: {
             type: DataTypes.STRING,
             allowNull: true
         },
-
         calories: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -76,7 +66,6 @@ const Recipe = sequelize.define(
                 }
             }
         },
-
         protein: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -88,7 +77,6 @@ const Recipe = sequelize.define(
                 }
             }
         },
-
         carbs: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -100,7 +88,6 @@ const Recipe = sequelize.define(
                 }
             }
         },
-
         fat: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -118,5 +105,4 @@ const Recipe = sequelize.define(
         timestamps: false
     }
 );
-
 module.exports = Recipe;

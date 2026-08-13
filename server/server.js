@@ -3,7 +3,10 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-const { sequelize, connectDatabase } = require("./database");
+const {
+    sequelize,
+    connectDatabase
+} = require("./database");
 
 // Import models so Sequelize knows about them
 require("./models");
@@ -16,7 +19,8 @@ const userRoutes = require("./routes/users");
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT =
+    Number(process.env.PORT) || 3000;
 
 
 /*
@@ -32,11 +36,18 @@ app.use(
     })
 );
 
-app.use(express.json());
+app.use(
+    express.json({
+        limit: "1mb"
+    })
+);
 
-app.use(express.urlencoded({
-    extended: true
-}));
+app.use(
+    express.urlencoded({
+        extended: true,
+        limit: "1mb"
+    })
+);
 
 
 /*
@@ -55,17 +66,74 @@ app.use(
 
 /*
 ====================================================
+SERVE SEEDED / STATIC IMAGES
+====================================================
+*/
+
+app.use(
+    "/images",
+    express.static(
+        path.join(__dirname, "images")
+    )
+);
+
+
+/*
+====================================================
 TEST ROUTE
 ====================================================
 */
 
-app.get("/", function (req, res) {
+app.get(
+    "/",
+    function (req, res) {
 
-    res.json({
-        message: "Recipe App backend is running!"
-    });
+        return res.json({
+            message:
+                "Recipe App backend is running!",
+            status:
+                "ok"
+        });
 
-});
+    }
+);
+
+
+/*
+====================================================
+HEALTH CHECK
+====================================================
+*/
+
+app.get(
+    "/api/health",
+    async function (req, res) {
+
+        try {
+
+            await sequelize.authenticate();
+
+            return res.json({
+                status: "ok",
+                database: "connected"
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Health check database error:",
+                error
+            );
+
+            return res.status(503).json({
+                status: "error",
+                database: "disconnected"
+            });
+
+        }
+
+    }
+);
 
 
 /*
@@ -74,31 +142,37 @@ DATABASE TEST
 ====================================================
 */
 
-app.get("/api/test-db", async function (req, res) {
+app.get(
+    "/api/test-db",
+    async function (req, res) {
 
-    try {
+        try {
 
-        await sequelize.authenticate();
+            await sequelize.authenticate();
 
-        res.json({
-            message: "SQLite is working with Sequelize!",
-            database: "Connected"
-        });
+            return res.json({
+                message:
+                    "SQLite is working with Sequelize!",
+                database:
+                    "Connected"
+            });
 
-    } catch (error) {
+        } catch (error) {
 
-        console.error(
-            "Database test error:",
-            error
-        );
+            console.error(
+                "Database test error:",
+                error
+            );
 
-        res.status(500).json({
-            message: "Database connection failed."
-        });
+            return res.status(500).json({
+                message:
+                    "Database connection failed."
+            });
+
+        }
 
     }
-
-});
+);
 
 
 /*
@@ -134,13 +208,16 @@ app.use(
 ====================================================
 */
 
-app.use(function (req, res) {
+app.use(
+    function (req, res) {
 
-    res.status(404).json({
-        message: "API route not found."
-    });
+        return res.status(404).json({
+            message:
+                "API route not found."
+        });
 
-});
+    }
+);
 
 
 /*
@@ -149,22 +226,30 @@ GENERAL ERROR HANDLER
 ====================================================
 */
 
-app.use(function (error, req, res, next) {
+app.use(
+    function (error, req, res, next) {
 
-    console.error(
-        "Server error:",
-        error
-    );
+        console.error(
+            "Server error:",
+            error
+        );
 
-    res.status(
-        error.status || 500
-    ).json({
-        message:
-            error.message ||
-            "Internal server error."
-    });
+        if (res.headersSent) {
+            return next(error);
+        }
 
-});
+        return res.status(
+            error.status || 500
+        ).json({
+
+            message:
+                error.message ||
+                "Internal server error."
+
+        });
+
+    }
+);
 
 
 /*
@@ -193,6 +278,7 @@ async function startServer() {
             );
 
             process.exit(1);
+
         }
 
 
@@ -227,6 +313,10 @@ async function startServer() {
                     `Uploaded images available at http://localhost:${PORT}/uploads/`
                 );
 
+                console.log(
+                    `Static images available at http://localhost:${PORT}/images/`
+                );
+
             }
         );
 
@@ -238,6 +328,7 @@ async function startServer() {
         );
 
         process.exit(1);
+
     }
 
 }

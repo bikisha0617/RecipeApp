@@ -5,101 +5,49 @@ const Ingredient = require("./Ingredient");
 const Instruction = require("./Instruction");
 const Favourite = require("./Favourite");
 
-/*
-====================================================
-USER <-> RECIPE
-====================================================
-*/
-
 User.hasMany(Recipe, {
     foreignKey: "userId",
     as: "recipes",
     onDelete: "CASCADE"
 });
-
 Recipe.belongsTo(User, {
     foreignKey: "userId",
     as: "user"
 });
-
-
-/*
-====================================================
-RECIPE <-> INGREDIENT
-====================================================
-*/
-
 Recipe.hasMany(Ingredient, {
     foreignKey: "recipeId",
     as: "ingredients",
     onDelete: "CASCADE"
 });
-
 Ingredient.belongsTo(Recipe, {
     foreignKey: "recipeId",
     as: "recipe"
 });
-
-
-/*
-====================================================
-RECIPE <-> INSTRUCTION
-====================================================
-*/
-
 Recipe.hasMany(Instruction, {
     foreignKey: "recipeId",
     as: "instructions",
     onDelete: "CASCADE"
 });
-
 Instruction.belongsTo(Recipe, {
     foreignKey: "recipeId",
     as: "recipe"
 });
-
-
-/*
-====================================================
-USER <-> FAVOURITE
-====================================================
-*/
-
 User.hasMany(Favourite, {
     foreignKey: "userId",
     as: "favourites",
     onDelete: "CASCADE"
 });
-
 Favourite.belongsTo(User, {
     foreignKey: "userId",
     as: "user"
 });
-
-
-/*
-====================================================
-RECIPE <-> FAVOURITE
-====================================================
-*/
-
 Recipe.hasMany(Favourite, {
     foreignKey: "recipeId",
     as: "favourites",
     onDelete: "CASCADE"
 });
-
 Favourite.belongsTo(Recipe, {
     foreignKey: "recipeId",
     as: "recipe"
 });
-
-
-module.exports = {
-    User,
-    Admin,
-    Recipe,
-    Ingredient,
-    Instruction,
-    Favourite
-};
+module.exports = {User,Admin,Recipe,Ingredient,Instruction,Favourite};

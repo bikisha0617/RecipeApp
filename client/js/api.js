@@ -1,247 +1,158 @@
 const API_BASE_URL = "http://localhost:3000/api";
 
-
-// ====================================================
-// GET TOKEN
-// ====================================================
-
-function getToken() {
-
+function getAuthToken() {
     return localStorage.getItem("token");
-
 }
 
-
-// ====================================================
-// GET CURRENT USER
-// ====================================================
-
-function getCurrentUser() {
-
-    const user =
-        localStorage.getItem("user");
-
-
-    if (!user) {
-
-        return null;
-
+function getAuthHeaders(includeJson = true) {
+    const headers = {};
+    if (includeJson) {
+        headers["Content-Type"] = "application/json";
     }
-
-
-    try {
-
-        return JSON.parse(user);
-
-    } catch (error) {
-
-        console.error(
-            "Could not read stored user:",
-            error
-        );
-
-        return null;
-
-    }
-
-}
-
-
-// ====================================================
-// SAVE AUTHENTICATION DATA
-// ====================================================
-
-function saveAuth(token, user) {
-
+    const token = getAuthToken();
     if (token) {
-
-        localStorage.setItem(
-            "token",
-            token
-        );
-
+        headers["Authorization"] = `Bearer ${token}`;
     }
-
-
-    if (user) {
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify(user)
-        );
-
-    }
-
+    return headers;
 }
-
-
-// ====================================================
-// CLEAR AUTHENTICATION DATA
-// ====================================================
-
-function clearAuth() {
-
-    localStorage.removeItem("token");
-
-    localStorage.removeItem("user");
-
-}
-
-
-// ====================================================
-// API REQUEST
-// ====================================================
 
 async function apiRequest(
     endpoint,
     options = {}
 ) {
-
-    const token =
-        getToken();
-
-
-    const headers = {
-        ...(options.headers || {})
+    const url =
+        `${API_BASE_URL}${endpoint}`;
+    const config = {
+        ...options,
+        headers: {
+            ...getAuthHeaders(
+                !(options.body instanceof FormData)
+            ),
+            ...(options.headers || {})
+        }
     };
-
-
-    if (token) {
-
-        headers["Authorization"] =
-            `Bearer ${token}`;
-
-    }
-
-
-    const response =
-        await fetch(
-            `${API_BASE_URL}${endpoint}`,
-            {
-                ...options,
-                headers
-            }
-        );
-
-
-    let data = null;
-
-
     try {
-
-        data =
-            await response.json();
-
-    } catch (error) {
-
-        data = null;
-
-    }
-
-
-    if (!response.ok) {
-
+        const response =
+            await fetch(
+                url,
+                config
+            );
+        let data = null;
+        const contentType =
+            response.headers.get(
+                "content-type"
+            );
         if (
-            response.status === 401 ||
-            response.status === 403
+            contentType &&
+            contentType.includes(
+                "application/json"
+            )
+        ) {
+            data =
+                await response.json();
+        } else {
+            data =
+                await response.text();
+        }
+        if (
+            response.status === 401
         ) {
 
-            const currentToken =
-                getToken();
-
-
-            if (
-                currentToken &&
-                response.status === 401
-            ) {
-
-                clearAuth();
-
-            }
-
+            localStorage.removeItem(
+                "token"
+            );
+            localStorage.removeItem(
+                "loggedIn"
+            );
+            localStorage.removeItem(
+                "userId"
+            );
+            localStorage.removeItem(
+                "userName"
+            );
+            localStorage.removeItem(
+                "userEmail"
+            );
+            localStorage.removeItem(
+                "userType"
+            );
         }
-
-
-        throw new Error(
-            data?.message ||
-            "Something went wrong with the request."
+        return {
+            ok: response.ok,
+            status: response.status,
+            data: data
+        };
+    } catch (error) {
+        console.error(
+            "API request error:",
+            error
         );
-
+        throw error;
     }
-
-
-    return data;
-
 }
-
-
-// ====================================================
-// CHECK WHETHER USER IS LOGGED IN
-// ====================================================
-
-function isLoggedIn() {
-
-    return Boolean(
-        getToken() &&
-        getCurrentUser()
+async function getAllRecipes() {
+    return await apiRequest(
+        "/recipes",
+        {
+            method: "GET"
+        }
     );
-
 }
 
-
-// ====================================================
-// REQUIRE LOGIN
-// ====================================================
-
-function requireLogin() {
-
-    if (!isLoggedIn()) {
-
-        window.location.href =
-            "login.html";
-
-        return false;
-
-    }
-
-
-    return true;
-
+async function getRecipe(
+    id
+) {
+    return await apiRequest(
+        `/recipes/${Number(id)}`,
+        {
+            method: "GET"
+        }
+    );
 }
 
-
-// ====================================================
-// LOGOUT
-// ====================================================
-
-function logout() {
-
-    clearAuth();
-
-    window.location.href =
-        "login.html";
-
+async function getUserRecipes(
+    userId
+) {
+    return await apiRequest(
+        `/recipes/user/${Number(userId)}`,
+        {
+            method: "GET"
+        }
+    );
 }
 
+async function createRecipe(
+    formData
+) {
+    return await apiRequest(
+        "/recipes",
+        {
+            method: "POST",
+            body: formData
+        }
+    );
+}
 
-// ====================================================
-// EXPORT / GLOBAL ACCESS
-// ====================================================
+async function updateRecipe(
+    id,
+    formData
+) {
+    return await apiRequest(
+        `/recipes/${Number(id)}`,
+        {
+            method: "PUT",
+            body: formData
+        }
+    );
+}
 
-window.API_BASE_URL = API_BASE_URL;
-
-window.getToken = getToken;
-
-window.getCurrentUser = getCurrentUser;
-
-window.saveAuth = saveAuth;
-
-window.clearAuth = clearAuth;
-
-window.apiRequest = apiRequest;
-
-window.isLoggedIn = isLoggedIn;
-
-window.requireLogin = requireLogin;
-
-window.logout = logout;
+async function deleteRecipeFromAPI(
+    id
+) {
+    return await apiRequest(
+        `/recipes/${Number(id)}`,
+        {
+            method: "DELETE"
+        }
+    );
+}

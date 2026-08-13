@@ -1,15 +1,12 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../database");
-
-const Admin = sequelize.define(
-    "Admin",
+const Admin = sequelize.define("Admin",
     {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-
         username: {
             type: DataTypes.STRING(100),
             allowNull: false,
@@ -24,19 +21,16 @@ const Admin = sequelize.define(
                 }
             }
         },
-
         password: {
             type: DataTypes.STRING,
             allowNull: false
         },
-
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false,
             field: "created_at",
             defaultValue: DataTypes.NOW
         },
-
         updatedAt: {
             type: DataTypes.DATE,
             allowNull: false,
@@ -46,9 +40,7 @@ const Admin = sequelize.define(
     },
     {
         tableName: "admins",
-
         timestamps: false
     }
 );
-
 module.exports = Admin;

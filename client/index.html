@@ -4,87 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe App</title>
-
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
+    <header class="navbar">
+        <div class="logo">
+            <img src="images/logo.png" alt="Recipe App Logo">
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Explore</a>
+            <a href="myrecipes.html">My Recipes</a>
+            <a href="create.html">Create</a>
+            <a href="favourites.html">Favourites</a>
+        </nav>
 
-<!-- Navbar -->
-<header class="navbar">
-    <div class="logo">
-        <img src="images/logo.png" alt="Logo">
-    </div>
-
-    <nav class="nav-links">
-        <a href="index.html">Explore</a>
-        <a href="myrecipes.html">My Recipes</a>
-        <a href="create.html">Create</a>
-        <a href="favourites.html">Favourites</a>
-    </nav>
-
-    <div class="search-bar">
-        <img src="images/icons/search.png" alt="Search">
-        <input type="text" placeholder="Search recipes" id="searchInput">
-    </div>
-
-    <div class="account-section">
-
-        <!-- Guest -->
-        <button id="loginBtn">Login</button>
-
-        <!-- Logged In -->
-        <div id="profileSection" class="profile-section">
-            <a href="profile.html"><img src="images/icons/profile.png" class="profile-pic" alt="Profile"></a>
-            <button id="dropdownBtn" class="dropdown-btn">
-                <img src="images/icons/dropdown.png" alt="Dropdown">
-            </button>
+        <div class="search-bar">
+            <img src="images/icons/search.png" alt="Search">
+            <input type="text" id="searchInput" placeholder="Search recipes" autocomplete="off">
         </div>
 
-        <!-- Dropdown -->
-        <div id="dropdownMenu" class="dropdown-menu">
-            <div class="dropdown-user">
-                <img src="images/icons/profile.png" class="dropdown-profile" alt="Profile">
-                <div>
-                    <h4>Bikisha Maharjan</h4>
-                    <small>bikisha@gmail.com</small>
+        <div class="account-section">
+            <!-- Guest -->
+            <button id="loginBtn" type="button">Login</button>
+            <!-- Logged In -->
+            <div id="profileSection" class="profile-section">
+                <a href="profile.html">
+                    <img src="images/icons/profile.png" class="profile-pic" alt="Profile">
+                </a>
+                <button id="dropdownBtn" class="dropdown-btn" type="button" aria-label="Open account menu">
+                    <img src="images/icons/dropdown.png" alt="Dropdown">
+                </button>
+            </div>
+
+            <!-- Dropdown -->
+            <div id="dropdownMenu" class="dropdown-menu">
+                <div class="dropdown-user">
+                    <img src="images/icons/profile.png" class="dropdown-profile" alt="Profile">
+                    <div>
+                        <h4 id="dropdownName">Guest User</h4>
+                        <small id="dropdownEmail">guest@email.com</small>
+                    </div>
                 </div>
-            </div>
-            <hr>
-            <div class="dropdown-item" id="switchAccount">
-                Add another account
+                <hr>
+                <div class="dropdown-item" id="switchAccount">Logout</div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<main class="container">
+    <main class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <a href="index.html"><img src="images/icons/recipe.png" alt="Recipes">Recipes</a>
+            <a href="favourites.html"><img src="images/icons/favourite.png" alt="Favourites">Favourites</a>
+            <div class="settings">
+                <a href="settings.html"><img src="images/icons/settings.png" alt="Settings"></a>
+            </div>
+        </aside>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <a href="index.html">
-            <img src="images/icons/recipe.png" alt="Recipes">Recipes
-        </a>
+        <section class="recipes-grid" id="recipeContainer">
+        </section>
+    </main>
 
-        <a href="favourites.html">
-            <img src="images/icons/favourite.png" alt="Favourites">Favourites
-        </a>
-
-        <div class="settings">
-            <a href="settings.html">
-                <img src="images/icons/settings.png" alt="Settings">
-            </a>
-        </div>
-    </aside>
-
-    <!-- Recipes -->
-    <section class="recipes-grid" id="recipeContainer">
-    </section>
-</main>
-
-<script src="js/api.js"></script>
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
-<script src="js/navbar.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/navbar.js"></script>
 </body>
 </html>

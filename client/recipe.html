@@ -8,95 +8,91 @@
     <link rel="stylesheet" href="css/recipe.css">
 </head>
 <body>
-
-<!-- Navbar -->
 <header class="navbar">
     <div class="logo">
-        <img src="images/logo.png">
+        <img src="images/logo.png" alt="Recipe App Logo">
     </div>
-
     <nav class="nav-links">
         <a href="index.html">Explore</a>
         <a href="myrecipes.html">My Recipes</a>
         <a href="create.html">Create</a>
-        <a href="favourites.html">Favourites</a>
+        <a href="favourites.html">Favourite</a>
     </nav>
 
     <div class="search-bar">
-        <img src="images/icons/search.png">
+        <img src="images/icons/search.png" alt="Search">
         <input type="text" placeholder="Search recipes">
     </div>
 
     <div class="account-section">
-
-            <!-- Guest -->
-            <button id="loginBtn">Login</button>
-
-            <!-- Logged In -->
-            <div id="profileSection" class="profile-section">
-                <a href="profile.html"><img src="images/icons/profile.png" class="profile-pic" alt="Profile"></a>
-                <button id="dropdownBtn" class="dropdown-btn">
-                    <img src="images/icons/dropdown.png" alt="Dropdown">
-                </button>
-            </div>
-
-            <!-- Dropdown -->
-            <div id="dropdownMenu" class="dropdown-menu">
-                <div class="dropdown-user">
-                    <img src="images/icons/profile.png" class="dropdown-profile" alt="Profile">
-                    <div>
-                        <h4>Bikisha Maharjan</h4>
-                        <small>bikisha@gmail.com</small>
-                    </div>
-                </div>
-                <hr>
-                <div class="dropdown-item" id="switchAccount">
-                    Add another account
+        <button id="loginBtn" type="button"> Login</button>
+        <div id="profileSection" class="profile-section">
+            <a href="profile.html">
+                <img src="images/icons/profile.png" class="profile-pic" alt="Profile">
+            </a>
+            <button id="dropdownBtn" class="dropdown-btn" type="button">
+                <img src="images/icons/dropdown.png" alt="Dropdown">
+            </button>
+        </div>
+        <div id="dropdownMenu" class="dropdown-menu">
+            <div class="dropdown-user">
+                <img src="images/icons/profile.png" class="dropdown-profile" alt="Profile">
+                <div>
+                    <h4>Bikisha Maharjan</h4>
+                    <small>bikisha@gmail.com</small>
                 </div>
             </div>
+            <hr>
+            <div class="dropdown-item" id="switchAccount"> Add another account </div>
+        </div>
+    </div>
 </header>
 
 <main class="recipe-page">
-
-    <!-- Recipe Page -->
-    <img id="recipeImage" class="hero-image">
+    <img id="recipeImage" class="hero-image" src="images/placeholder.jpg" alt="Recipe">
     <div class="recipe-info">
         <div class="title-row">
-            <h1 id="recipeTitle"></h1>
-            <img src="images/icons/HeartUnfilled.png" id="heart" class="heart">
+            <h1 id="recipeTitle">Loading recipe...</h1>
+            <img src="images/icons/HeartUnfilled.png" id="heart" class="heart" alt="Add to favourites">
         </div>
-        <p class="author" id="recipeAuthor"></p>
+        <p class="author" id="recipeAuthor"> Loading...</p>
         <div class="details">
             <div>
                 <strong>Time</strong>
-                <p id="recipeTime"></p>
+                <p id="recipeTime"> - </p>
             </div>
-
             <div>
-                <strong>Servings</strong>
-                <p id="recipeServings"></p>
+                <strong> Servings </strong>
+                <p id="recipeServings">  - </p>
             </div>
-
             <div>
-                <strong>Difficulty</strong>
-                <p id="recipeDifficulty"></p>
+                <strong> Difficulty </strong>
+                <p id="recipeDifficulty"> - </p>
             </div>
         </div>
-        <h2>Description</h2>
-        <p id="recipeDescription"></p>
-        <h2>Ingredients</h2>
-        <ul id="ingredientsList"></ul>
-        <h2>Instructions</h2>
-        <ol id="instructionsList"></ol>
-        <h2>Nutrition (Per Serving)</h2>
-        <ul id="nutritionList"></ul>
+        <h2> Description </h2>
+        <p id="recipeDescription"> Loading description...</p>
+        <h2> Ingredients </h2>
+        <ul id="ingredientsList">
+            <li> Loading ingredients...</li>
+        </ul>
+        <h2> Instructions</h2>
+        <ol id="instructionsList">
+            <li>  Loading instructions... </li>
+        </ol>
+        <h2> Nutrition (Per Serving)
+        </h2>
+        <ul id="nutritionList">
+            <li> Calories: 0 kcal </li>
+            <li> Protein: 0 g </li>
+            <li> Carbs: 0 g</li>
+            <li> Fat: 0 g</li>
+        </ul>
     </div>
 </main>
 
-
 <script src="js/api.js"></script>
-<script src="js/data.js"></script>
-<script src="js/recipe.js"></script>
 <script src="js/navbar.js"></script>
+<script src="js/recipe.js"></script>
 </body>
 </html>
