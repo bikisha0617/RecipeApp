@@ -10,7 +10,6 @@
 }
 
 /* Card */
-
 .settings-card{
     max-width:700px;
     background:#ffefe4;
@@ -20,7 +19,6 @@
 }
 
 /* Profile */
-
 .profile-section-settings{
     display:flex;
     align-items:center;
@@ -50,7 +48,6 @@
 }
 
 /* Form */
-
 .settings-card label{
     display:block;
     margin-top:20px;
@@ -74,7 +71,6 @@
 }
 
 /* Toggles */
-
 .toggle-row{
     display:flex;
     justify-content:space-between;
@@ -96,7 +92,6 @@
 }
 
 /* Buttons */
-
 .button-row{
     display:flex;
     gap:15px;
@@ -134,7 +129,6 @@
 }
 
 /* Modal */
-
 .modal{
     display:none;
     position:fixed;
@@ -188,21 +182,17 @@
 }
 
 /* Responsive */
-
 @media(max-width:1000px){
     .settings-page{
         margin-left:0;
         padding:20px;
     }
-
     .settings-card{
         max-width:100%;
     }
-
     .button-row{
         flex-direction:column;
     }
-
     #saveBtn,#deleteBtn{
         width:100%;
     }

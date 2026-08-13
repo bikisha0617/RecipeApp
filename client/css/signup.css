@@ -18,7 +18,6 @@ body{
 }
 
 /* Signup box */
-
 .signup-container {
     width: 100%;
     max-width: 450px;
@@ -29,7 +28,6 @@ body{
 }
 
 /* Heading */
-
 .signup-container h1 {
     margin: 0 0 10px;
     text-align: center;
@@ -46,7 +44,6 @@ body{
 }
 
 /* Form */
-
 #signupForm {
     display: flex;
     flex-direction: column;
@@ -92,7 +89,6 @@ body{
 }
 
 /* Create account button */
-
 #signupBtn {
     width: 100%;
     padding: 14px;
@@ -112,7 +108,6 @@ body{
 }
 
 /* Login link */
-
 .login-link {
     margin: 25px 0 0;
     text-align: center;
@@ -121,7 +116,6 @@ body{
 
 .login-link a {
     color: #7D0633;
-    /* font-weight: 600; */
     text-decoration: none;
 }
 
@@ -130,27 +124,19 @@ body{
 }
 
 
-/* =========================
-   RESPONSIVE
-========================= */
-
+/* Responsive */
 @media (max-width: 500px) {
-
     .signup-page {
         padding: 25px 15px;
     }
-
     .signup-container {
         padding: 30px 22px;
         border-radius: 12px;
     }
-
     .signup-container h1 {
         font-size: 28px;
     }
-
     .signup-subtitle {
         font-size: 14px;
     }
-
 }

@@ -64,12 +64,6 @@
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:25px;
-
-    /* display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 40px;
-    text-align: center; */
 }
 
 .profile-card-small{
@@ -88,8 +82,6 @@
 .profile-card-small h3{
     padding:15px;
 }
-
-/* Banner */
 
 .profile-banner{
     background:#ffefe4;
@@ -137,8 +129,6 @@
     border-radius:10px;
 }
 
-/* Stats */
-
 .stats{
     display:flex;
     justify-content:space-around;
@@ -156,7 +146,6 @@
 }
 
 /* Tabs */
-
 .tabs {
     display: flex;
     justify-content: center;
@@ -177,8 +166,6 @@
     color:white;
 }
 
-/* Content */
-
 .tab-content{
     display:none;
 }
@@ -188,7 +175,6 @@
 }
 
 /* About */
-
 .about-card{
     background:#ffefe4;
     border-radius:20px;
@@ -226,38 +212,31 @@
 }
 
 /* Responsive */
-
 @media(max-width:1000px){
     .profile-page{
         margin-left:0;
         padding:20px;
     }
-
     .recipe-grid{
         grid-template-columns:1fr;
     }
-
     .profile-stats{
         gap:40px;
     }
 }
-
 @media(max-width:900px){
     .profile-header{
         flex-direction:column;
         text-align:center;
     }
-
     .profile-info{
         margin:20px 0;
     }
-
     .stats{
         flex-direction:column;
         gap:25px;
         text-align:center;
     }
-
     .tabs{
         justify-content:center;
         flex-wrap:wrap;

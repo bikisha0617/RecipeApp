@@ -1,404 +1,163 @@
 const express = require("express");
 const router = express.Router();
-
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
 const db = require("../database");
 
-
-// =====================================================
 // Upload Directory
-// =====================================================
-
-const uploadDir =
-    path.join(__dirname, "..", "uploads");
-
-
+const uploadDir = path.join(__dirname, "..", "uploads");
 if (!fs.existsSync(uploadDir)) {
-
-    fs.mkdirSync(
-        uploadDir,
+    fs.mkdirSync(uploadDir,
         {
             recursive: true
         }
     );
 }
 
-
-// =====================================================
 // Multer Storage
-// =====================================================
+const storage = multer.diskStorage({
+    destination: function (req,file,cb) {
+        cb(null,uploadDir);
+    },
+    filename: function (req,file,cb) {
+        const extension = path.extname(file.originalname);
+        const filename = Date.now() +"-" +Math.round(Math.random() * 1E9) +extension;
+        cb(null,filename);
+    }
+});
 
-const storage =
-    multer.diskStorage({
-
-        destination: function (
-            req,
-            file,
-            cb
-        ) {
-
-            cb(
-                null,
-                uploadDir
-            );
-        },
-
-
-        filename: function (
-            req,
-            file,
-            cb
-        ) {
-
-            const extension =
-                path.extname(
-                    file.originalname
-                );
-
-
-            const filename =
-                Date.now() +
-                "-" +
-                Math.round(
-                    Math.random() * 1E9
-                ) +
-                extension;
-
-
-            cb(
-                null,
-                filename
-            );
-        }
-    });
-
-
-// =====================================================
 // Multer Upload
-// =====================================================
-
-const upload =
-    multer({
-
-        storage: storage,
-
-        fileFilter:
-            function (
-                req,
-                file,
-                cb
-            ) {
-
-                const allowedTypes = [
-                    "image/jpeg",
-                    "image/jpg",
-                    "image/png",
-                    "image/webp"
-                ];
-
-
-                if (
-                    allowedTypes.includes(
-                        file.mimetype
-                    )
-                ) {
-
-                    cb(
-                        null,
-                        true
-                    );
-
-                } else {
-
-                    cb(
-                        new Error(
-                            "Only JPG, JPEG, PNG and WEBP images are allowed."
-                        )
-                    );
-                }
-            },
-
-
-        limits: {
-            fileSize:
-                5 * 1024 * 1024
+const upload =multer({
+    storage: storage,
+    fileFilter:function (req,file,cb) {
+        const allowedTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+        ];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null,true);        
+        } else {
+            cb(new Error("Only JPG, JPEG, PNG and WEBP images are allowed."));
         }
-    });
+    },
+    limits: {
+        fileSize:5 * 1024 * 1024
+    }
+});
 
-
-// =====================================================
 // Convert Database Image to URL
-// =====================================================
-
 function getImageUrl(image) {
-
     if (!image) {
         return null;
     }
-
-
-    image =
-        String(image).trim();
-
-
+    image = String(image).trim();
     if (image === "") {
         return null;
     }
-
-
     // Already complete URL
-    if (
-        image.startsWith("http://") ||
-        image.startsWith("https://")
-    ) {
-
+    if (image.startsWith("http://") || image.startsWith("https://")) {
         return image;
     }
-
-
     // If it contains /uploads/
-    if (
-        image.includes("/uploads/")
-    ) {
-
-        const filename =
-            image
-                .split("/uploads/")
-                .pop();
-
-
-        return (
-            "http://localhost:3000/uploads/" +
-            path.basename(filename)
-        );
+    if (image.includes("/uploads/")) {
+        const filename = image.split("/uploads/").pop();
+        return ("http://localhost:3000/uploads/" + path.basename(filename));
     }
-
-
     // uploads/filename
-    if (
-        image.startsWith("uploads/")
-    ) {
-
-        return (
-            "http://localhost:3000/" +
-            image
-        );
+    if (image.startsWith("uploads/")) {
+        return ("http://localhost:3000/" + image);
     }
-
-
     // Filename only
-    return (
-        "http://localhost:3000/uploads/" +
-        path.basename(image)
-    );
+    return ("http://localhost:3000/uploads/" + path.basename(image));
 }
 
-
-// =====================================================
 // Get User Recipes
-// =====================================================
-
-router.get(
-    "/user/:userId",
-    (req, res) => {
-
-        const userId =
-            req.params.userId;
-
-
-        db.all(
-            `
-            SELECT *
-            FROM recipes
-            WHERE user_id = ?
-            ORDER BY id DESC
-            `,
-            [userId],
-
-            (err, recipes) => {
-
-                if (err) {
-
-                    console.error(
-                        "Get user recipes error:",
-                        err
-                    );
-
-                    return res.status(500).json({
-                        message:
-                            "Database error."
-                    });
-                }
-
-
-                recipes.forEach(
-                    function (recipe) {
-
-                        recipe.image =
-                            getImageUrl(
-                                recipe.image
-                            );
-                    }
-                );
-
-
-                res.json(
-                    recipes
-                );
+router.get("/user/:userId",(req, res) => {
+    const userId =req.params.userId;
+    db.all(
+        `
+        SELECT * FROM recipes WHERE user_id = ? ORDER BY id DESC
+        `,[userId],
+        (err, recipes) => {
+            if (err) {
+                console.error("Get user recipes error:",err);
+                return res.status(500).json({
+                    message:"Database error."
+                });
             }
-        );
-    }
-);
+            recipes.forEach(function (recipe) {
+                recipe.image = getImageUrl(recipe.image);
+            });
+            res.json(recipes);
+        });
+    });
 
-
-// =====================================================
 // Get One Recipe
-// =====================================================
-
-router.get(
-    "/:id",
-    (req, res) => {
-
-        const recipeId =
-            req.params.id;
-
-
-        db.get(
-            `
-            SELECT *
-            FROM recipes
-            WHERE id = ?
-            `,
-            [recipeId],
-
-            (err, recipe) => {
-
+router.get("/:id",(req, res) => {
+    const recipeId = req.params.id;
+    db.get(
+        `
+        SELECT * FROM recipes WHERE id = ?
+        `,[recipeId],
+        (err, recipe) => {
+            if (err) {
+                console.error("Get recipe error:",err);
+                return res.status(500).json({
+                    message:"Database error."
+                });
+            }
+            if (!recipe) {
+                return res.status(404).json({
+                    message:"Recipe not found."
+                });
+            }
+            db.all(
+                `
+                SELECT ingredient FROM ingredients WHERE recipe_id = ? ORDER BY rowid ASC
+                `,
+                [recipeId],
+               (err, ingredients) => {
                 if (err) {
-
-                    console.error(
-                        "Get recipe error:",
-                        err
-                    );
-
-                    return res.status(500).json({
-                        message:
-                            "Database error."
-                    });
-                }
-
-
-                if (!recipe) {
-
-                    return res.status(404).json({
-                        message:
-                            "Recipe not found."
-                    });
-                }
-
-
-                // ===============================
-                // Ingredients
-                // ===============================
-
-                db.all(
-                    `
-                    SELECT ingredient
-                    FROM ingredients
-                    WHERE recipe_id = ?
-                    ORDER BY rowid ASC
-                    `,
-                    [recipeId],
-
-                    (err, ingredients) => {
-
-                        if (err) {
-
-                            console.error(
-                                "Get ingredients error:",
-                                err
-                            );
-
-                            return res.status(500).json({
-                                message:
-                                    "Database error."
-                            });
-                        }
-
-
-                        // ===============================
-                        // Instructions
-                        // ===============================
-
-                        db.all(
-                            `
-                            SELECT instruction
-                            FROM instructions
-                            WHERE recipe_id = ?
-                            ORDER BY rowid ASC
-                            `,
-                            [recipeId],
-
-                            (err, instructions) => {
-
-                                if (err) {
-
-                                    console.error(
-                                        "Get instructions error:",
-                                        err
-                                    );
-
-                                    return res.status(500).json({
-                                        message:
-                                            "Database error."
-                                    });
-                                }
-
-
-                                recipe.ingredients =
-                                    ingredients.map(
-                                        function (item) {
-
-                                            return item.ingredient;
-                                        }
-                                    );
-
-
-                                recipe.instructions =
-                                    instructions.map(
-                                        function (item) {
-
-                                            return item.instruction;
-                                        }
-                                    );
-
-
-                                // Convert image
-                                recipe.image =
-                                    getImageUrl(
-                                        recipe.image
-                                    );
-
-
-                                res.json(
-                                    recipe
-                                );
-                            }
-                        );
+                    console.error("Get ingredients error:",err);
+                        return res.status(500).json({
+                            message:"Database error."
+                        });
                     }
-                );
+                    db.all(
+                        `
+                        SELECT instruction FROM instructions WHERE recipe_id = ? ORDER BY rowid ASC
+                        `,
+                        [recipeId],
+                        (err, instructions) => {
+                            if (err) {
+                                console.error("Get instructions error:",err);
+                                return res.status(500).json({
+                                    message:"Database error."
+                                });
+                             }
+                            recipe.ingredients = ingredients.map(
+                                function (item) {
+                                    return item.ingredient;
+                                }
+                            );
+                            recipe.instructions = instructions.map(
+                                function (item) {
+                                    return item.instruction;
+                                }
+                            );
+                            // Convert image
+                            recipe.image = getImageUrl(recipe.image);
+                            res.json(recipe);
+                        });
+                    });
+                });
             }
         );
-    }
-);
 
-
-// =====================================================
 // Create Recipe
-// =====================================================
-
 router.post(
     "/",
     upload.single("image"),

@@ -1,196 +1,171 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const db =
-    require("./database");
+const { sequelize } = require("./models");
 
-const authRoutes =
-    require("./routes/auth");
+const authRoutes = require("./routes/auth");
+const recipeRoutes = require("./routes/recipes");
+const favouriteRoutes = require("./routes/favourites");
+const userRoutes = require("./routes/users");
 
-const recipeRoutes =
-    require("./routes/recipes");
+const app = express();
 
-const favouriteRoutes =
-    require("./routes/favourites");
-
-const userRoutes =
-    require("./routes/users");
+const PORT = process.env.PORT || 3000;
 
 
-const app =
-    express();
-
-
-const PORT =
-    3000;
-
-
-// =====================================================
-// Middleware
-// =====================================================
+/*
+=====================================================
+MIDDLEWARE
+=====================================================
+*/
 
 app.use(
-    cors()
+    cors({
+        origin: true,
+        credentials: true
+    })
 );
 
+app.use(express.json());
 
-app.use(
-    express.json()
-);
+app.use(express.urlencoded({ extended: true }));
 
 
-// =====================================================
-// Serve Uploaded Images
-// =====================================================
+/*
+=====================================================
+UPLOADED IMAGES
+=====================================================
+*/
 
 app.use(
     "/uploads",
-    express.static(
-        path.join(
-            __dirname,
-            "uploads"
-        )
-    )
+    express.static(path.join(__dirname, "uploads"))
 );
 
 
-// =====================================================
-// Test Route
-// =====================================================
+/*
+=====================================================
+TEST ROUTE
+=====================================================
+*/
 
-app.get(
-    "/",
-    (req, res) => {
+app.get("/", function (req, res) {
+    res.json({
+        message: "Recipe App backend is running!"
+    });
+});
+
+
+/*
+=====================================================
+DATABASE TEST
+=====================================================
+*/
+
+app.get("/api/test-db", async function (req, res) {
+    try {
+        await sequelize.authenticate();
 
         res.json({
-            message:
-                "Recipe App backend is running!"
+            message: "SQLite + Sequelize is working!"
         });
-    }
-);
-
-
-// =====================================================
-// Test Database
-// =====================================================
-
-app.get(
-    "/api/test-db",
-    (req, res) => {
-
-        db.get(
-            "SELECT 1 AS result",
-            [],
-
-            (err, row) => {
-
-                if (err) {
-
-                    return res.status(500).json({
-                        error:
-                            err.message
-                    });
-                }
-
-
-                res.json({
-
-                    message:
-                        "SQLite is working!",
-
-                    result:
-                        row.result
-                });
-            }
-        );
-    }
-);
-
-
-// =====================================================
-// API Routes
-// =====================================================
-
-app.use(
-    "/api/auth",
-    authRoutes
-);
-
-
-app.use(
-    "/api/recipes",
-    recipeRoutes
-);
-
-
-app.use(
-    "/api/favourites",
-    favouriteRoutes
-);
-
-
-app.use(
-    "/api/users",
-    userRoutes
-);
-
-
-// =====================================================
-// 404
-// =====================================================
-
-app.use(
-    function (req, res) {
-
-        res.status(404).json({
-            message:
-                "API route not found."
-        });
-    }
-);
-
-
-// =====================================================
-// General Error Handler
-// =====================================================
-
-app.use(
-    function (
-        error,
-        req,
-        res,
-        next
-    ) {
-
-        console.error(
-            "Server error:",
-            error
-        );
-
+    } catch (error) {
+        console.error("Database test error:", error);
 
         res.status(500).json({
-            message:
-                "Internal server error."
+            message: "Database connection failed."
         });
     }
-);
+});
 
 
-// =====================================================
-// Start Server
-// =====================================================
+/*
+=====================================================
+API ROUTES
+=====================================================
+*/
 
-app.listen(
-    PORT,
-    function () {
+app.use("/api/auth", authRoutes);
 
-        console.log(
-            `Server running at http://localhost:${PORT}`
-        );
+app.use("/api/recipes", recipeRoutes);
 
-        console.log(
-            `Uploaded images available at http://localhost:${PORT}/uploads/`
+app.use("/api/favourites", favouriteRoutes);
+
+app.use("/api/users", userRoutes);
+
+
+/*
+=====================================================
+404 HANDLER
+=====================================================
+*/
+
+app.use(function (req, res) {
+    res.status(404).json({
+        message: "API route not found."
+    });
+});
+
+
+/*
+=====================================================
+GENERAL ERROR HANDLER
+=====================================================
+*/
+
+app.use(function (error, req, res, next) {
+    console.error("Server error:", error);
+
+    res.status(500).json({
+        message: "Internal server error."
+    });
+});
+
+
+/*
+=====================================================
+START SERVER
+=====================================================
+*/
+
+async function startServer() {
+    try {
+        await sequelize.authenticate();
+
+        console.log("Connected to SQLite database through Sequelize.");
+
+        /*
+        Creates missing tables.
+
+        We intentionally do not use alter:true here because
+        your existing database already contains data and
+        automatically altering an existing SQLite database
+        can cause unwanted schema changes.
+        */
+
+        await sequelize.sync();
+
+        console.log("Database models synchronized.");
+
+        app.listen(PORT, function () {
+            console.log(
+                `Server running at http://localhost:${PORT}`
+            );
+
+            console.log(
+                `Uploaded images available at http://localhost:${PORT}/uploads/`
+            );
+        });
+
+    } catch (error) {
+        console.error(
+            "Unable to start server:",
+            error
         );
     }
-);
+}
+
+startServer();

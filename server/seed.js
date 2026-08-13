@@ -1,5 +1,4 @@
 const db = require("./database");
-
 const recipes = [
     {
         title: "Avocado Toast with Egg",
@@ -25,7 +24,6 @@ const recipes = [
             "Top with eggs and chilli flakes."
         ]
     },
-
     {
         title: "White Sauce Pasta",
         author: "Sophia Rossi",
@@ -54,7 +52,6 @@ const recipes = [
             "Serve hot."
         ]
     },
-
     {
         title: "Veggie Wrap",
         author: "Maya Singh",
@@ -81,7 +78,6 @@ const recipes = [
             "Fold the tortilla and cut in half."
         ]
     },
-
     {
         title: "Chicken Curry",
         author: "Kabir Khan",
@@ -110,7 +106,6 @@ const recipes = [
             "Serve hot with rice."
         ]
     },
-
     {
         title: "Banana Pancakes",
         author: "Emma Collins",
@@ -142,7 +137,6 @@ const recipes = [
             "Serve with maple syrup or honey."
         ]
     },
-
     {
         title: "Vegetable Fried Rice",
         author: "Ethan Wong",
@@ -170,7 +164,6 @@ const recipes = [
             "Garnish with spring onions and drizzle with sesame oil."
         ]
     },
-
     {
         title: "Fresh Fruit Salad",
         author: "Sofia Martinez",
@@ -194,7 +187,6 @@ const recipes = [
             "Chill for at least 30 minutes before serving."
         ]
     },
-
     {
         title: "Stir-Fry Noodles",
         author: "Chen Wei",
@@ -222,7 +214,6 @@ const recipes = [
             "Garnish with chilli flakes."
         ]
     },
-
     {
         title: "Chocolate Mug Cake",
         author: "Olivia Brown",
@@ -247,7 +238,6 @@ const recipes = [
             "Let cool for a few minutes before serving."
         ]
     },
-
     {
         title: "Paneer Butter Masala",
         author: "Ananya Gupta",
@@ -275,7 +265,6 @@ const recipes = [
             "Simmer for 10-15 minutes until the curry thickens."
         ]
     },
-
     {
         title: "Grilled Chicken Salad",
         author: "Noah Bennett",
@@ -301,7 +290,6 @@ const recipes = [
             "Season with salt and black pepper to taste."
         ]
     },
-
     {
         title: "Vegetable Omelette",
         author: "Riya Patel",
@@ -328,7 +316,6 @@ const recipes = [
     }
 ];
 
-
 // Create a temporary user for default recipes
 db.run(
     `
@@ -337,16 +324,12 @@ db.run(
     VALUES (1, 'Recipe App', 'default@recipeapp.com', '')
     `,
     function (err) {
-
         if (err) {
             console.error("Could not create default user:", err.message);
             return;
         }
-
         recipes.forEach((recipe, index) => {
-
             const recipeId = index + 1;
-
             db.run(
                 `
                 INSERT OR IGNORE INTO recipes
@@ -375,9 +358,7 @@ db.run(
                     recipe.image
                 ]
             );
-
             recipe.ingredients.forEach(ingredient => {
-
                 db.run(
                     `
                     INSERT OR IGNORE INTO ingredients
@@ -386,11 +367,8 @@ db.run(
                     `,
                     [recipeId, ingredient]
                 );
-
             });
-
             recipe.instructions.forEach(instruction => {
-
                 db.run(
                     `
                     INSERT OR IGNORE INTO instructions
@@ -399,11 +377,8 @@ db.run(
                     `,
                     [recipeId, instruction]
                 );
-
             });
-
         });
-
         console.log("Default recipes added.");
     }
 );

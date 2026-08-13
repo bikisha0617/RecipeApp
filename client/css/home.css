@@ -10,7 +10,6 @@ body{
 }
 
 /* Navbar */
-
 .navbar{
     width:100%;
     height:80px;
@@ -46,7 +45,6 @@ body{
 }
 
 /* Search */
-
 .search-bar{
     width:450px;
     height:45px;
@@ -76,7 +74,6 @@ body{
 }
 
 /* Login */
-
 .account-section{
     display:flex;
     align-items:center;
@@ -110,7 +107,6 @@ body{
 }
 
 /* Dropdown */
-
 .dropdown-menu{
     position:absolute;
     top:65px;
@@ -171,7 +167,6 @@ hr{
 }
 
 /* Sidebar */
-
 .sidebar{
     position:fixed;
     top:80px;
@@ -213,7 +208,6 @@ hr{
 }
 
 /* Grid */
-
 .recipes-grid{
     flex:1;
     display:grid;
@@ -223,7 +217,6 @@ hr{
 }
 
 /* Card */
-
 .recipe-card{
     background:#ffefe4;
     border-radius:15px;
@@ -295,13 +288,11 @@ hr{
 }
 
 /* Responsive */
-
 @media(max-width:1200px){
     .recipes-grid{
         grid-template-columns:repeat(3,1fr);
     }
 }
-
 @media(max-width:900px){
     .container{
         flex-direction:column;
@@ -316,7 +307,6 @@ hr{
         grid-template-columns:repeat(2,1fr);
     }
 }
-
 @media(max-width:600px){
     .navbar{
         flex-direction:column;

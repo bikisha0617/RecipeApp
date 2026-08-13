@@ -61,7 +61,6 @@ li{
 }
 
 /* Responsive */
-
 @media(max-width:900px){
     .recipe-page{
         grid-template-columns:1fr;

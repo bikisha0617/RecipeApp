@@ -24,7 +24,6 @@ async function loadSettings() {
             alert(data.message || "Could not load settings.");
             return;
         }
-
         // Fill inputs
         nameInput.value = data.name || "";
         emailInput.value = data.email || "";
@@ -65,10 +64,8 @@ saveBtn.onclick = async function() {
             alert(data.message || "Could not save settings.");
             return;
         }
-
         localStorage.setItem("userName", name);
         localStorage.setItem("userEmail", email);
-
         alert("Settings saved!");
     } catch (error) {
         console.error(error);
@@ -99,12 +96,10 @@ confirmDelete.onclick = async function() {
             alert(data.message || "Could not delete account.");
             return;
         }
-        
         localStorage.removeItem("loggedIn");
         localStorage.removeItem("userId");
         localStorage.removeItem("userName");
         localStorage.removeItem("userEmail");
-
         alert("Account deleted.");
         window.location.href = "index.html";
     } catch (error) {
