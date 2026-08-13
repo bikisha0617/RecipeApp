@@ -13,7 +13,8 @@ const userRoutes = require("./routes/users");
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT =
+    process.env.PORT || 3000;
 
 
 /*
@@ -31,7 +32,11 @@ app.use(
 
 app.use(express.json());
 
-app.use(express.urlencoded({ extended: true }));
+app.use(
+    express.urlencoded({
+        extended: true
+    })
+);
 
 
 /*
@@ -42,44 +47,65 @@ UPLOADED IMAGES
 
 app.use(
     "/uploads",
-    express.static(path.join(__dirname, "uploads"))
+    express.static(
+        path.join(
+            __dirname,
+            "uploads"
+        )
+    )
 );
 
 
 /*
 =====================================================
-TEST ROUTE
+HOME TEST ROUTE
 =====================================================
 */
 
 app.get("/", function (req, res) {
+
     res.json({
-        message: "Recipe App backend is running!"
+        message:
+            "Recipe App backend is running!"
     });
+
 });
 
 
 /*
 =====================================================
-DATABASE TEST
+DATABASE TEST ROUTE
 =====================================================
 */
 
-app.get("/api/test-db", async function (req, res) {
-    try {
-        await sequelize.authenticate();
+app.get(
+    "/api/test-db",
+    async function (req, res) {
 
-        res.json({
-            message: "SQLite + Sequelize is working!"
-        });
-    } catch (error) {
-        console.error("Database test error:", error);
+        try {
 
-        res.status(500).json({
-            message: "Database connection failed."
-        });
+            await sequelize.authenticate();
+
+            res.json({
+                message:
+                    "SQLite + Sequelize is working!"
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Database test error:",
+                error
+            );
+
+            res.status(500).json({
+                message:
+                    "Database connection failed."
+            });
+        }
+
     }
-});
+);
 
 
 /*
@@ -88,13 +114,25 @@ API ROUTES
 =====================================================
 */
 
-app.use("/api/auth", authRoutes);
+app.use(
+    "/api/auth",
+    authRoutes
+);
 
-app.use("/api/recipes", recipeRoutes);
+app.use(
+    "/api/recipes",
+    recipeRoutes
+);
 
-app.use("/api/favourites", favouriteRoutes);
+app.use(
+    "/api/favourites",
+    favouriteRoutes
+);
 
-app.use("/api/users", userRoutes);
+app.use(
+    "/api/users",
+    userRoutes
+);
 
 
 /*
@@ -103,11 +141,16 @@ app.use("/api/users", userRoutes);
 =====================================================
 */
 
-app.use(function (req, res) {
-    res.status(404).json({
-        message: "API route not found."
-    });
-});
+app.use(
+    function (req, res) {
+
+        res.status(404).json({
+            message:
+                "API route not found."
+        });
+
+    }
+);
 
 
 /*
@@ -116,13 +159,26 @@ GENERAL ERROR HANDLER
 =====================================================
 */
 
-app.use(function (error, req, res, next) {
-    console.error("Server error:", error);
+app.use(
+    function (
+        error,
+        req,
+        res,
+        next
+    ) {
 
-    res.status(500).json({
-        message: "Internal server error."
-    });
-});
+        console.error(
+            "Server error:",
+            error
+        );
+
+        res.status(500).json({
+            message:
+                "Internal server error."
+        });
+
+    }
+);
 
 
 /*
@@ -132,40 +188,66 @@ START SERVER
 */
 
 async function startServer() {
-    try {
-        await sequelize.authenticate();
 
-        console.log("Connected to SQLite database through Sequelize.");
+    try {
 
         /*
-        Creates missing tables.
+        ---------------------------------------------
+        Check database connection
+        ---------------------------------------------
+        */
 
-        We intentionally do not use alter:true here because
-        your existing database already contains data and
-        automatically altering an existing SQLite database
-        can cause unwanted schema changes.
+        await sequelize.authenticate();
+
+        console.log(
+            "Connected to SQLite database through Sequelize."
+        );
+
+
+        /*
+        ---------------------------------------------
+        Synchronize models
+        ---------------------------------------------
         */
 
         await sequelize.sync();
 
-        console.log("Database models synchronized.");
+        console.log(
+            "Database models synchronized."
+        );
 
-        app.listen(PORT, function () {
-            console.log(
-                `Server running at http://localhost:${PORT}`
-            );
 
-            console.log(
-                `Uploaded images available at http://localhost:${PORT}/uploads/`
-            );
-        });
+        /*
+        ---------------------------------------------
+        Start Express
+        ---------------------------------------------
+        */
+
+        app.listen(
+            PORT,
+            function () {
+
+                console.log(
+                    `Server running at http://localhost:${PORT}`
+                );
+
+                console.log(
+                    `Uploaded images available at http://localhost:${PORT}/uploads/`
+                );
+
+            }
+        );
 
     } catch (error) {
+
         console.error(
             "Unable to start server:",
             error
         );
+
     }
+
 }
+
 
 startServer();
