@@ -4,14 +4,27 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const { sequelize } = require("./models");
+const {
+    sequelize
+} = require("./models");
 
-const authRoutes = require("./routes/auth");
-const recipeRoutes = require("./routes/recipes");
-const favouriteRoutes = require("./routes/favourites");
-const userRoutes = require("./routes/users");
 
-const app = express();
+const authRoutes =
+    require("./routes/auth");
+
+const recipeRoutes =
+    require("./routes/recipes");
+
+const favouriteRoutes =
+    require("./routes/favourites");
+
+const userRoutes =
+    require("./routes/users");
+
+
+const app =
+    express();
+
 
 const PORT =
     process.env.PORT || 3000;
@@ -30,7 +43,11 @@ app.use(
     })
 );
 
-app.use(express.json());
+
+app.use(
+    express.json()
+);
+
 
 app.use(
     express.urlencoded({
@@ -41,7 +58,7 @@ app.use(
 
 /*
 =====================================================
-UPLOADED IMAGES
+STATIC UPLOADS
 =====================================================
 */
 
@@ -58,23 +75,26 @@ app.use(
 
 /*
 =====================================================
-HOME TEST ROUTE
+HOME
 =====================================================
 */
 
-app.get("/", function (req, res) {
+app.get(
+    "/",
+    function (req, res) {
 
-    res.json({
-        message:
-            "Recipe App backend is running!"
-    });
+        res.json({
+            message:
+                "Recipe App backend is running!"
+        });
 
-});
+    }
+);
 
 
 /*
 =====================================================
-DATABASE TEST ROUTE
+DATABASE TEST
 =====================================================
 */
 
@@ -85,6 +105,7 @@ app.get(
         try {
 
             await sequelize.authenticate();
+
 
             res.json({
                 message:
@@ -98,10 +119,12 @@ app.get(
                 error
             );
 
+
             res.status(500).json({
                 message:
                     "Database connection failed."
             });
+
         }
 
     }
@@ -119,15 +142,18 @@ app.use(
     authRoutes
 );
 
+
 app.use(
     "/api/recipes",
     recipeRoutes
 );
 
+
 app.use(
     "/api/favourites",
     favouriteRoutes
 );
+
 
 app.use(
     "/api/users",
@@ -137,7 +163,7 @@ app.use(
 
 /*
 =====================================================
-404 HANDLER
+404
 =====================================================
 */
 
@@ -155,7 +181,7 @@ app.use(
 
 /*
 =====================================================
-GENERAL ERROR HANDLER
+ERROR HANDLER
 =====================================================
 */
 
@@ -171,6 +197,7 @@ app.use(
             "Server error:",
             error
         );
+
 
         res.status(500).json({
             message:
@@ -191,37 +218,21 @@ async function startServer() {
 
     try {
 
-        /*
-        ---------------------------------------------
-        Check database connection
-        ---------------------------------------------
-        */
-
         await sequelize.authenticate();
+
 
         console.log(
             "Connected to SQLite database through Sequelize."
         );
 
 
-        /*
-        ---------------------------------------------
-        Synchronize models
-        ---------------------------------------------
-        */
-
         await sequelize.sync();
+
 
         console.log(
             "Database models synchronized."
         );
 
-
-        /*
-        ---------------------------------------------
-        Start Express
-        ---------------------------------------------
-        */
 
         app.listen(
             PORT,
@@ -231,12 +242,14 @@ async function startServer() {
                     `Server running at http://localhost:${PORT}`
                 );
 
+
                 console.log(
                     `Uploaded images available at http://localhost:${PORT}/uploads/`
                 );
 
             }
         );
+
 
     } catch (error) {
 

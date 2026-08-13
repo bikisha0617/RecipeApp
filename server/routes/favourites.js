@@ -1,105 +1,407 @@
 const express = require("express");
+
+const {
+    Favourite,
+    Recipe,
+    Ingredient,
+    Instruction
+} = require("../models");
+
+const {
+    authenticateToken,
+    requireUser
+} = require("../middleware/auth");
+
+
 const router = express.Router();
-const db = require("../database");
 
-// Get user's favourites
-router.get("/:userId", (req, res) => {
-    const userId = req.params.userId;
-    const sql = `
-        SELECT recipes.*
-        FROM recipes
-        JOIN favourites
-        ON recipes.id = favourites.recipe_id
-        WHERE favourites.user_id = ?
-        ORDER BY favourites.id DESC
-    `;
-    db.all(sql, [userId], (err, recipes) => {
-        if (err) {
-            console.error("Get favourites error:",err);
-            return res.status(500).json({
-                message: "Database error."
-            });
-        }
-        res.json(recipes);
-    });
-});
 
-// Add favourite
-router.post("/", (req, res) => {
-    const {user_id,recipe_id} = req.body;
-    if (!user_id || !recipe_id) {
-        return res.status(400).json({
-            message: "User ID and recipe ID are required."
-        });
-    }
+/*
+=====================================================
+GET USER FAVOURITES
+=====================================================
+*/
 
-    // Check recipe exists
-    db.get(
-        `SELECT id FROM recipes WHERE id = ?`,
-        [recipe_id],
-        (err, recipe) => {
-            if (err) {
-                return res.status(500).json({
-                    message: "Database error."
+router.get(
+    "/",
+
+    authenticateToken,
+
+    requireUser,
+
+    async function (req, res) {
+
+        try {
+
+            const favourites =
+                await Favourite.findAll({
+
+                    where: {
+                        userId:
+                            req.user.id
+                    },
+
+                    include: [
+
+                        {
+                            model: Recipe,
+                            as: "recipe",
+
+                            include: [
+
+                                {
+                                    model: Ingredient,
+                                    as: "ingredients",
+
+                                    attributes: [
+                                        "ingredient"
+                                    ]
+                                },
+
+                                {
+                                    model: Instruction,
+                                    as: "instructions",
+
+                                    attributes: [
+                                        "instruction"
+                                    ]
+                                }
+
+                            ]
+
+                        }
+
+                    ],
+
+                    order: [
+                        [
+                            "id",
+                            "DESC"
+                        ]
+                    ]
+
                 });
-            }
-            if (!recipe) {
-                return res.status(404).json({
-                    message: "Recipe not found."
-                });
-            }
-            // Add favourite
-            db.run(
-                `
-                INSERT OR IGNORE INTO favourites (user_id, recipe_id) VALUES (?, ?)
-                `,
-                [
-                    user_id,
-                    recipe_id
-                ],
-                function (err) {
-                    if (err) {
-                        console.error("Add favourite error:",err);
-                        return res.status(500).json({
-                            message:"Could not add favourite."
-                        });
+
+
+            const recipes =
+                favourites.map(
+                    function (favourite) {
+
+                        const recipe =
+                            favourite.recipe;
+
+
+                        if (!recipe) {
+                            return null;
+                        }
+
+
+                        const result =
+                            recipe.toJSON();
+
+
+                        result.user_id =
+                            result.userId;
+
+                        delete result.userId;
+
+
+                        if (
+                            result.ingredients
+                        ) {
+
+                            result.ingredients =
+                                result.ingredients.map(
+                                    function (item) {
+
+                                        return item.ingredient;
+
+                                    }
+                                );
+
+                        }
+
+
+                        if (
+                            result.instructions
+                        ) {
+
+                            result.instructions =
+                                result.instructions.map(
+                                    function (item) {
+
+                                        return item.instruction;
+
+                                    }
+                                );
+
+                        }
+
+
+                        if (
+                            result.image &&
+                            !result.image.startsWith(
+                                "http"
+                            )
+                        ) {
+
+                            result.image =
+                                "http://localhost:3000/uploads/" +
+                                result.image;
+
+                        }
+
+
+                        return result;
+
                     }
-                    res.json({
-                        message:"Recipe added to favourites."
-                    });
-                }
-            );
-        }
-    );
-});
+                );
 
-// Remove favourite
-router.delete("/", (req, res) => {
-    const {user_id,recipe_id} = req.body;
-    if (!user_id || !recipe_id) {
-        return res.status(400).json({
-            message:"User ID and recipe ID are required."
-        });
-    }
-    db.run(
-        `
-        DELETE FROM favourites WHERE user_id = ? AND recipe_id = ?
-        `,
-        [
-            user_id,
-            recipe_id
-        ],
-        function (err) {
-            if (err) {
-                console.error("Remove favourite error:",err);
-                return res.status(500).json({
-                    message:"Could not remove favourite."
-                });
-            }
-            res.json({
-                message:"Recipe removed from favourites."
+
+            return res.json(
+                recipes.filter(Boolean)
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Get favourites error:",
+                error
+            );
+
+
+            return res.status(500).json({
+                message:
+                    "Could not retrieve favourites."
             });
+
         }
-    );
-});
+
+    }
+);
+
+
+/*
+=====================================================
+ADD FAVOURITE
+=====================================================
+*/
+
+router.post(
+    "/",
+
+    authenticateToken,
+
+    requireUser,
+
+    async function (req, res) {
+
+        try {
+
+            const recipeId =
+                Number(
+                    req.body.recipe_id
+                );
+
+
+            if (
+                !Number.isInteger(recipeId) ||
+                recipeId <= 0
+            ) {
+
+                return res.status(400).json({
+                    message:
+                        "Valid recipe ID is required."
+                });
+
+            }
+
+
+            /*
+            -----------------------------------------
+            CHECK RECIPE
+            -----------------------------------------
+            */
+
+            const recipe =
+                await Recipe.findByPk(
+                    recipeId
+                );
+
+
+            if (!recipe) {
+
+                return res.status(404).json({
+                    message:
+                        "Recipe not found."
+                });
+
+            }
+
+
+            /*
+            -----------------------------------------
+            CHECK EXISTING FAVOURITE
+            -----------------------------------------
+            */
+
+            const existing =
+                await Favourite.findOne({
+
+                    where: {
+                        userId:
+                            req.user.id,
+
+                        recipeId:
+                            recipeId
+                    }
+
+                });
+
+
+            if (existing) {
+
+                return res.status(409).json({
+                    message:
+                        "Recipe is already in favourites."
+                });
+
+            }
+
+
+            /*
+            -----------------------------------------
+            CREATE
+            -----------------------------------------
+            */
+
+            const favourite =
+                await Favourite.create({
+
+                    userId:
+                        req.user.id,
+
+                    recipeId:
+                        recipeId
+
+                });
+
+
+            return res.status(201).json({
+
+                message:
+                    "Recipe added to favourites.",
+
+                favouriteId:
+                    favourite.id
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Add favourite error:",
+                error
+            );
+
+
+            return res.status(500).json({
+                message:
+                    "Could not add favourite."
+            });
+
+        }
+
+    }
+);
+
+
+/*
+=====================================================
+REMOVE FAVOURITE
+=====================================================
+*/
+
+router.delete(
+    "/:recipeId",
+
+    authenticateToken,
+
+    requireUser,
+
+    async function (req, res) {
+
+        try {
+
+            const recipeId =
+                Number(
+                    req.params.recipeId
+                );
+
+
+            if (
+                !Number.isInteger(recipeId) ||
+                recipeId <= 0
+            ) {
+
+                return res.status(400).json({
+                    message:
+                        "Invalid recipe ID."
+                });
+
+            }
+
+
+            const deleted =
+                await Favourite.destroy({
+
+                    where: {
+
+                        userId:
+                            req.user.id,
+
+                        recipeId:
+                            recipeId
+
+                    }
+
+                });
+
+
+            if (
+                deleted === 0
+            ) {
+
+                return res.status(404).json({
+                    message:
+                        "Favourite not found."
+                });
+
+            }
+
+
+            return res.json({
+                message:
+                    "Recipe removed from favourites."
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Remove favourite error:",
+                error
+            );
+
+
+            return res.status(500).json({
+                message:
+                    "Could not remove favourite."
+            });
+
+        }
+
+    }
+);
+
+
 module.exports = router;
