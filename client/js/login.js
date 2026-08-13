@@ -1,107 +1,115 @@
-const form = document.getElementById("loginForm");
+document.addEventListener("DOMContentLoaded", function () {
 
-if (form) {
-    form.addEventListener("submit", async function (e) {
-        e.preventDefault();
+    const form =
+        document.getElementById("loginForm");
 
-        const emailInput = document.getElementById("email");
-        const passwordInput = document.getElementById("password");
+    if (!form) {
+        return;
+    }
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
+    const message =
+        document.getElementById("loginMessage");
 
-        // Validate fields
-        if (email === "" || password === "") {
-            alert("Please fill in all fields.");
-            return;
-        }
+    form.addEventListener(
+        "submit",
+        async function (event) {
 
-        try {
-            const response = await fetch(
-                "http://localhost:3000/api/auth/login",
-                {
-                    method: "POST",
+            event.preventDefault();
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+            const emailInput =
+                document.getElementById("email");
 
-                    body: JSON.stringify({
-                        email: email.toLowerCase(),
-                        password: password
-                    })
-                }
-            );
+            const passwordInput =
+                document.getElementById("password");
 
-            const data = await response.json();
+            const email =
+                emailInput.value.trim().toLowerCase();
 
-            if (!response.ok) {
-                alert(data.message || "Login failed.");
+            const password =
+                passwordInput.value;
+
+
+            if (!email || !password) {
+                showMessage(
+                    "Email and password are required.",
+                    true
+                );
                 return;
             }
 
-            /*
-            ====================================================
-            SAVE AUTHENTICATION INFORMATION
-            ====================================================
-            */
 
-            if (data.token) {
-                localStorage.setItem(
-                    "token",
-                    data.token
-                );
-            }
+            try {
 
-            if (data.user) {
-                localStorage.setItem(
-                    "loggedIn",
-                    "true"
-                );
+                const response =
+                    await fetch(
+                        API_BASE_URL + "/auth/login",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body: JSON.stringify({
+                                email: email,
+                                password: password
+                            })
+                        }
+                    );
 
-                localStorage.setItem(
-                    "userId",
-                    String(data.user.id)
-                );
+                const data =
+                    await response.json();
 
-                localStorage.setItem(
-                    "userName",
-                    data.user.name || ""
-                );
 
-                localStorage.setItem(
-                    "userEmail",
-                    data.user.email || ""
-                );
-
-                if (data.user.type) {
-                    localStorage.setItem(
-                        "userType",
-                        data.user.type
+                if (!response.ok) {
+                    throw new Error(
+                        data.message ||
+                        "Login failed."
                     );
                 }
+
+
+                saveAuth(
+                    data.token,
+                    data.user,
+                    data.role || "user"
+                );
+
+
+                window.location.href =
+                    "index.html";
+
+            } catch (error) {
+
+                console.error(
+                    "Login error:",
+                    error
+                );
+
+                showMessage(
+                    error.message ||
+                    "Could not log in.",
+                    true
+                );
             }
-
-            /*
-            ====================================================
-            LOGIN SUCCESS
-            ====================================================
-            */
-
-            alert("Login successful!");
-
-            window.location.href = "index.html";
-
-        } catch (error) {
-
-            console.error(
-                "Login error:",
-                error
-            );
-
-            alert(
-                "Could not connect to the server. Please make sure the server is running."
-            );
         }
-    });
-}
+    );
+
+
+    function showMessage(text, isError) {
+
+        if (!message) {
+            alert(text);
+            return;
+        }
+
+        message.textContent = text;
+        message.style.display = "block";
+
+        if (isError) {
+            message.classList.add("error");
+        } else {
+            message.classList.remove("error");
+        }
+    }
+
+});

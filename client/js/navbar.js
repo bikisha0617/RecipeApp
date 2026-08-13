@@ -1,83 +1,156 @@
-const loginBtn = document.getElementById("loginBtn");
-const profileSection = document.getElementById("profileSection");
-const dropdownBtn = document.getElementById("dropdownBtn");
-const dropdownMenu = document.getElementById("dropdownMenu");
-const dropdownName = document.getElementById("dropdownName");
-const dropdownEmail = document.getElementById("dropdownEmail");
-const switchAccount = document.getElementById("switchAccount");
+document.addEventListener("DOMContentLoaded", function () {
 
+    const loginBtn = document.getElementById("loginBtn");
+    const profileSection = document.getElementById("profileSection");
+    const dropdownBtn = document.getElementById("dropdownBtn");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const dropdownName = document.getElementById("dropdownName");
+    const dropdownEmail = document.getElementById("dropdownEmail");
+    const switchAccount = document.getElementById("switchAccount");
 
-/* Check login */
-function updateNavbar() {
-    const loggedIn = localStorage.getItem("loggedIn") === "true";
-    const userId = localStorage.getItem("userId");
-    if (loggedIn && userId) {
-        /* Hide login button */
+    const token = getToken();
+    const user = getCurrentUser();
+    const role = getUserRole();
+
+    /* =========================
+       LOGIN STATE
+    ========================= */
+
+    if (token && user) {
+
         if (loginBtn) {
             loginBtn.style.display = "none";
         }
-        /* Show profile */
+
         if (profileSection) {
             profileSection.style.display = "flex";
         }
-        /* Show user name */
+
         if (dropdownName) {
-            dropdownName.textContent = localStorage.getItem("userName") || "Guest User";
+            dropdownName.textContent =
+                user.name || user.username || "User";
         }
-        /* Show user email */
+
         if (dropdownEmail) {
-            dropdownEmail.textContent = localStorage.getItem("userEmail") || "guest@email.com";
+            dropdownEmail.textContent =
+                user.email || user.username || "";
         }
+
     } else {
-        /* Show login button */
+
         if (loginBtn) {
             loginBtn.style.display = "block";
         }
-        /* Hide profile */
+
         if (profileSection) {
             profileSection.style.display = "none";
         }
     }
-}
-/* Run when page loads */
-updateNavbar();
 
-/* Login Button */
-if (loginBtn) {
-    loginBtn.onclick = function () {
-        window.location.href = "login.html";
 
-    };
-}
+    /* =========================
+       ADMIN LINK
+    ========================= */
 
-/* Dropdown */
-if (dropdownBtn) {
-    dropdownBtn.onclick = function (e) {
-        e.stopPropagation();
-        if (!dropdownMenu) {
-            return;
+    if (role === "admin") {
+
+        const navLinks =
+            document.querySelector(".nav-links");
+
+        if (navLinks &&
+            !navLinks.querySelector('a[href="admin.html"]')) {
+
+            const adminLink =
+                document.createElement("a");
+
+            adminLink.href = "admin.html";
+            adminLink.textContent = "Admin";
+
+            navLinks.appendChild(adminLink);
         }
-        if (dropdownMenu.style.display === "block") {
-            dropdownMenu.style.display = "none";
-        } else {
-            dropdownMenu.style.display = "block";
-        }
-    };
-}
-/* Close dropdown */
-window.onclick = function () {
-    if (dropdownMenu) {
-        dropdownMenu.style.display = "none";
     }
-};
 
-/* switch account/ logout */
-if (switchAccount) {
-    switchAccount.onclick = function () {
-        localStorage.removeItem("loggedIn");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("userName");
-        localStorage.removeItem("userEmail");
-        window.location.href = "login.html";
-    };
-}
+
+    /* =========================
+       LOGIN BUTTON
+    ========================= */
+
+    if (loginBtn) {
+
+        loginBtn.addEventListener(
+            "click",
+            function () {
+                window.location.href = "login.html";
+            }
+        );
+    }
+
+
+    /* =========================
+       DROPDOWN
+    ========================= */
+
+    if (dropdownBtn && dropdownMenu) {
+
+        dropdownBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                if (dropdownMenu.style.display === "block") {
+                    dropdownMenu.style.display = "none";
+                } else {
+                    dropdownMenu.style.display = "block";
+                }
+            }
+        );
+    }
+
+
+    /* =========================
+       CLOSE DROPDOWN
+    ========================= */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            if (!dropdownMenu) {
+                return;
+            }
+
+            if (
+                event.target !== dropdownMenu &&
+                !dropdownMenu.contains(event.target) &&
+                event.target !== dropdownBtn
+            ) {
+                dropdownMenu.style.display = "none";
+            }
+        }
+    );
+
+
+    /* =========================
+       LOGOUT
+    ========================= */
+
+    if (switchAccount) {
+
+        switchAccount.textContent =
+            token ? "Logout" : "Login";
+
+        switchAccount.addEventListener(
+            "click",
+            function () {
+
+                if (token) {
+                    logout();
+                } else {
+                    window.location.href = "login.html";
+                }
+            }
+        );
+    }
+
+});

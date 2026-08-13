@@ -1,783 +1,543 @@
-const API_BASE_URL = "http://localhost:3000";
+document.addEventListener("DOMContentLoaded", function () {
 
-const params = new URLSearchParams(
-    window.location.search
-);
-
-const recipeId = Number(
-    params.get("id")
-);
-
-let recipe = null;
-
-const userId =
-    localStorage.getItem("userId");
-
-/*
-=====================================================
-IMAGE URL
-=====================================================
-*/
-
-function getImageUrl(image) {
-
-    if (!image) {
-        return "images/placeholder.jpg";
-    }
-
-    const cleanImage =
-        String(image).trim();
-
-    if (!cleanImage) {
-        return "images/placeholder.jpg";
-    }
-
-    if (
-        cleanImage.startsWith("http://") ||
-        cleanImage.startsWith("https://")
-    ) {
-        return cleanImage;
-    }
-
-    if (cleanImage.includes("/uploads/")) {
-
-        return (
-            API_BASE_URL +
-            "/uploads/" +
-            cleanImage
-                .split("/uploads/")
-                .pop()
+    const params =
+        new URLSearchParams(
+            window.location.search
         );
 
-    }
+    const recipeId =
+        Number(params.get("id"));
 
-    if (cleanImage.startsWith("uploads/")) {
+    let recipe = null;
 
-        return (
-            API_BASE_URL +
-            "/" +
-            cleanImage
-        );
 
-    }
+    /* =========================
+       IMAGE
+    ========================= */
 
-    return (
-        API_BASE_URL +
-        "/uploads/" +
-        cleanImage
-    );
-}
+    function getImageUrl(image) {
 
-/*
-=====================================================
-SHOW ERROR
-=====================================================
-*/
+        if (!image) {
+            return "images/placeholder.jpg";
+        }
 
-function showRecipeError(message) {
+        const clean =
+            String(image).trim();
 
-    const recipePage =
-        document.querySelector(
-            ".recipe-page"
-        );
-
-    if (!recipePage) {
-        return;
-    }
-
-    recipePage.innerHTML = `
-        <div class="empty-state">
-            <h2>${message}</h2>
-            <p>Please return to the Explore page.</p>
-            <a href="index.html">
-                Back to recipes
-            </a>
-        </div>
-    `;
-}
-
-/*
-=====================================================
-DISPLAY RECIPE
-=====================================================
-*/
-
-function displayRecipe(recipe) {
-
-    const recipeImage =
-        document.getElementById(
-            "recipeImage"
-        );
-
-    const recipeTitle =
-        document.getElementById(
-            "recipeTitle"
-        );
-
-    const recipeAuthor =
-        document.getElementById(
-            "recipeAuthor"
-        );
-
-    const recipeTime =
-        document.getElementById(
-            "recipeTime"
-        );
-
-    const recipeServings =
-        document.getElementById(
-            "recipeServings"
-        );
-
-    const recipeDifficulty =
-        document.getElementById(
-            "recipeDifficulty"
-        );
-
-    const recipeDescription =
-        document.getElementById(
-            "recipeDescription"
-        );
-
-    /*
-    -----------------------------------------------
-    IMAGE
-    -----------------------------------------------
-    */
-
-    if (recipeImage) {
-
-        recipeImage.src =
-            getImageUrl(
-                recipe.image
-            );
-
-        recipeImage.alt =
-            recipe.title ||
-            "Recipe";
-
-        recipeImage.onerror =
-            function () {
-
-                this.onerror = null;
-
-                this.src =
-                    "images/placeholder.jpg";
-
-            };
-
-    }
-
-    /*
-    -----------------------------------------------
-    TITLE
-    -----------------------------------------------
-    */
-
-    if (recipeTitle) {
-
-        recipeTitle.textContent =
-            recipe.title ||
-            "Untitled Recipe";
-
-    }
-
-    /*
-    -----------------------------------------------
-    AUTHOR
-    -----------------------------------------------
-    */
-
-    if (recipeAuthor) {
-
-        recipeAuthor.textContent =
-            "By " +
-            (
-                recipe.author ||
-                "Recipe App"
-            );
-
-    }
-
-    /*
-    -----------------------------------------------
-    TIME
-    -----------------------------------------------
-    */
-
-    if (recipeTime) {
-
-        recipeTime.textContent =
-            recipe.time
-                ? recipe.time
-                : "-";
-
-    }
-
-    /*
-    -----------------------------------------------
-    SERVINGS
-    -----------------------------------------------
-    */
-
-    if (recipeServings) {
-
-        recipeServings.textContent =
-            recipe.servings ||
-            "-";
-
-    }
-
-    /*
-    -----------------------------------------------
-    DIFFICULTY
-    -----------------------------------------------
-    */
-
-    if (recipeDifficulty) {
-
-        recipeDifficulty.textContent =
-            recipe.difficulty ||
-            "-";
-
-    }
-
-    /*
-    -----------------------------------------------
-    DESCRIPTION
-    -----------------------------------------------
-    */
-
-    if (recipeDescription) {
-
-        recipeDescription.textContent =
-            recipe.description ||
-            "No description available.";
-
-    }
-
-    /*
-    -----------------------------------------------
-    INGREDIENTS
-    -----------------------------------------------
-    */
-
-    const ingredientsList =
-        document.getElementById(
-            "ingredientsList"
-        );
-
-    if (ingredientsList) {
-
-        ingredientsList.innerHTML = "";
+        if (!clean) {
+            return "images/placeholder.jpg";
+        }
 
         if (
-            Array.isArray(
-                recipe.ingredients
-            ) &&
-            recipe.ingredients.length > 0
+            clean.startsWith("http://") ||
+            clean.startsWith("https://")
         ) {
-
-            recipe.ingredients.forEach(
-                function (item) {
-
-                    const li =
-                        document.createElement(
-                            "li"
-                        );
-
-                    li.textContent = item;
-
-                    ingredientsList.appendChild(
-                        li
-                    );
-
-                }
-            );
-
-        } else {
-
-            ingredientsList.innerHTML =
-                "<li>No ingredients listed.</li>";
-
+            return clean;
         }
 
-    }
-
-    /*
-    -----------------------------------------------
-    INSTRUCTIONS
-    -----------------------------------------------
-    */
-
-    const instructionsList =
-        document.getElementById(
-            "instructionsList"
-        );
-
-    if (instructionsList) {
-
-        instructionsList.innerHTML = "";
-
-        if (
-            Array.isArray(
-                recipe.instructions
-            ) &&
-            recipe.instructions.length > 0
-        ) {
-
-            recipe.instructions.forEach(
-                function (step) {
-
-                    const li =
-                        document.createElement(
-                            "li"
-                        );
-
-                    li.textContent = step;
-
-                    instructionsList.appendChild(
-                        li
-                    );
-
-                }
-            );
-
-        } else {
-
-            instructionsList.innerHTML =
-                "<li>No instructions listed.</li>";
-
+        if (clean.startsWith("images/")) {
+            return clean;
         }
 
-    }
-
-    /*
-    -----------------------------------------------
-    NUTRITION
-    -----------------------------------------------
-    */
-
-    const nutritionList =
-        document.getElementById(
-            "nutritionList"
-        );
-
-    if (nutritionList) {
-
-        nutritionList.innerHTML = `
-            <li>
-                Calories: ${recipe.calories ?? 0} kcal
-            </li>
-
-            <li>
-                Protein: ${recipe.protein ?? 0} g
-            </li>
-
-            <li>
-                Carbs: ${recipe.carbs ?? 0} g
-            </li>
-
-            <li>
-                Fat: ${recipe.fat ?? 0} g
-            </li>
-        `;
-
-    }
-
-}
-
-/*
-=====================================================
-LOAD RECIPE
-=====================================================
-*/
-
-async function loadRecipe() {
-
-    if (
-        !Number.isInteger(recipeId) ||
-        recipeId <= 0
-    ) {
-
-        showRecipeError(
-            "Invalid recipe ID."
-        );
-
-        return;
-    }
-
-    console.log(
-        "Loading recipe ID:",
-        recipeId
-    );
-
-    try {
-
-        const response =
-            await fetch(
-                `${API_BASE_URL}/api/recipes/${recipeId}`
+        if (clean.startsWith("/images/")) {
+            return (
+                "http://localhost:3000" +
+                clean
             );
-
-        console.log(
-            "Recipe response status:",
-            response.status
-        );
-
-        const text =
-            await response.text();
-
-        console.log(
-            "Recipe response:",
-            text
-        );
-
-        let data;
-
-        try {
-
-            data =
-                JSON.parse(text);
-
-        } catch (parseError) {
-
-            console.error(
-                "Invalid JSON returned by server:",
-                text
-            );
-
-            throw new Error(
-                "Server returned invalid data."
-            );
-
         }
 
-        if (!response.ok) {
-
-            throw new Error(
-                data.message ||
-                "Recipe not found."
+        if (clean.startsWith("uploads/")) {
+            return (
+                "http://localhost:3000/" +
+                clean
             );
-
         }
 
-        recipe = data;
+        if (clean.startsWith("/uploads/")) {
+            return (
+                "http://localhost:3000" +
+                clean
+            );
+        }
 
-        displayRecipe(recipe);
-
-        await loadFavouriteStatus();
-
-    } catch (error) {
-
-        console.error(
-            "Load recipe error:",
-            error
+        return (
+            "http://localhost:3000/uploads/" +
+            encodeURIComponent(clean)
         );
-
-        showRecipeError(
-            error.message ||
-            "Could not load recipe."
-        );
-
     }
 
-}
 
-/*
-=====================================================
-LOAD FAVOURITE STATUS
-=====================================================
-*/
+    /* =========================
+       ERROR
+    ========================= */
 
-async function loadFavouriteStatus() {
+    function showError(message) {
 
-    const heart =
-        document.getElementById(
-            "heart"
-        );
-
-    if (!heart) {
-        return;
-    }
-
-    if (!userId) {
-
-        updateHeart(false);
-
-        return;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                `${API_BASE_URL}/api/favourites/${userId}`
+        const page =
+            document.querySelector(
+                ".recipe-page"
             );
 
-        const data =
-            await response.json();
-
-        if (!response.ok) {
-
-            updateHeart(false);
-
+        if (!page) {
             return;
         }
 
-        const favourites =
-            Array.isArray(data)
-                ? data
-                : [];
+        page.innerHTML =
+            "<div class='empty-state'>" +
+            "<h2>" +
+            message +
+            "</h2>" +
+            "<p>Please return to the Explore page.</p>" +
+            "<a href='index.html'>Back to recipes</a>" +
+            "</div>";
+    }
 
-        const isFavourite =
-            favourites.some(
-                function (item) {
 
-                    return (
-                        Number(
-                            item.id ||
-                            item.recipe_id ||
-                            item.recipeId
-                        ) ===
-                        Number(recipeId)
-                    );
+    /* =========================
+       DISPLAY
+    ========================= */
 
-                }
+    function displayRecipe(data) {
+
+        const image =
+            document.getElementById(
+                "recipeImage"
             );
 
-        updateHeart(
-            isFavourite
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Favourite status error:",
-            error
-        );
-
-        updateHeart(false);
-
-    }
-
-}
-
-/*
-=====================================================
-UPDATE HEART
-=====================================================
-*/
-
-function updateHeart(isFavourite) {
-
-    const heart =
-        document.getElementById(
-            "heart"
-        );
-
-    if (!heart) {
-        return;
-    }
-
-    if (isFavourite) {
-
-        heart.src =
-            "images/icons/HeartFilled.png";
-
-        heart.alt =
-            "Remove from favourites";
-
-    } else {
-
-        heart.src =
-            "images/icons/HeartUnfilled.png";
-
-        heart.alt =
-            "Add to favourites";
-
-    }
-
-}
-
-/*
-=====================================================
-TOGGLE FAVOURITE
-=====================================================
-*/
-
-async function toggleFavourite() {
-
-    if (!userId) {
-
-        alert(
-            "Please log in first."
-        );
-
-        window.location.href =
-            "login.html";
-
-        return;
-    }
-
-    if (!recipe) {
-        return;
-    }
-
-    try {
-
-        const getResponse =
-            await fetch(
-                `${API_BASE_URL}/api/favourites/${userId}`
+        const title =
+            document.getElementById(
+                "recipeTitle"
             );
 
-        const favourites =
-            await getResponse.json();
-
-        if (!getResponse.ok) {
-
-            alert(
-                favourites.message ||
-                "Could not load favourites."
+        const author =
+            document.getElementById(
+                "recipeAuthor"
             );
 
-            return;
+        const time =
+            document.getElementById(
+                "recipeTime"
+            );
+
+        const servings =
+            document.getElementById(
+                "recipeServings"
+            );
+
+        const difficulty =
+            document.getElementById(
+                "recipeDifficulty"
+            );
+
+        const description =
+            document.getElementById(
+                "recipeDescription"
+            );
+
+
+        if (image) {
+
+            image.src =
+                getImageUrl(
+                    data.image
+                );
+
+            image.alt =
+                data.title || "Recipe";
+
+            image.onerror =
+                function () {
+
+                    this.onerror = null;
+
+                    this.src =
+                        "images/placeholder.jpg";
+                };
         }
 
-        const alreadyFavourite =
-            Array.isArray(favourites) &&
-            favourites.some(
-                function (item) {
 
-                    return (
-                        Number(
-                            item.id ||
-                            item.recipe_id ||
-                            item.recipeId
-                        ) ===
-                        Number(recipe.id)
-                    );
+        if (title) {
+            title.textContent =
+                data.title ||
+                "Untitled Recipe";
+        }
 
-                }
+
+        if (author) {
+            author.textContent =
+                "By " +
+                (
+                    data.author ||
+                    "Recipe App"
+                );
+        }
+
+
+        if (time) {
+            time.textContent =
+                data.time || "-";
+        }
+
+
+        if (servings) {
+            servings.textContent =
+                data.servings || "-";
+        }
+
+
+        if (difficulty) {
+            difficulty.textContent =
+                data.difficulty || "-";
+        }
+
+
+        if (description) {
+            description.textContent =
+                data.description ||
+                "No description available.";
+        }
+
+
+        /* INGREDIENTS */
+
+        const ingredientsList =
+            document.getElementById(
+                "ingredientsList"
             );
 
-        if (alreadyFavourite) {
+        if (ingredientsList) {
 
-            const response =
-                await fetch(
-                    `${API_BASE_URL}/api/favourites`,
-                    {
-                        method: "DELETE",
+            ingredientsList.innerHTML = "";
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+            if (
+                Array.isArray(data.ingredients) &&
+                data.ingredients.length > 0
+            ) {
 
-                        body: JSON.stringify({
-                            user_id:
-                                Number(userId),
+                data.ingredients.forEach(
+                    function (ingredient) {
 
-                            recipe_id:
-                                Number(recipe.id)
-                        })
+                        const li =
+                            document.createElement(
+                                "li"
+                            );
+
+                        li.textContent =
+                            ingredient;
+
+                        ingredientsList.appendChild(
+                            li
+                        );
                     }
                 );
 
-            const data =
-                await response.json();
+            } else {
 
-            if (!response.ok) {
-
-                alert(
-                    data.message ||
-                    "Could not remove favourite."
-                );
-
-                return;
+                ingredientsList.innerHTML =
+                    "<li>No ingredients listed.</li>";
             }
+        }
 
-            updateHeart(false);
 
-        } else {
+        /* INSTRUCTIONS */
 
-            const response =
-                await fetch(
-                    `${API_BASE_URL}/api/favourites`,
-                    {
-                        method: "POST",
+        const instructionsList =
+            document.getElementById(
+                "instructionsList"
+            );
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+        if (instructionsList) {
 
-                        body: JSON.stringify({
-                            user_id:
-                                Number(userId),
+            instructionsList.innerHTML = "";
 
-                            recipe_id:
-                                Number(recipe.id)
-                        })
+            if (
+                Array.isArray(data.instructions) &&
+                data.instructions.length > 0
+            ) {
+
+                data.instructions.forEach(
+                    function (instruction) {
+
+                        const li =
+                            document.createElement(
+                                "li"
+                            );
+
+                        li.textContent =
+                            instruction;
+
+                        instructionsList.appendChild(
+                            li
+                        );
                     }
                 );
 
-            const data =
-                await response.json();
+            } else {
 
-            if (!response.ok) {
-
-                alert(
-                    data.message ||
-                    "Could not add favourite."
-                );
-
-                return;
+                instructionsList.innerHTML =
+                    "<li>No instructions listed.</li>";
             }
-
-            updateHeart(true);
-
         }
 
-    } catch (error) {
 
-        console.error(
-            "Favourite error:",
-            error
-        );
+        /* NUTRITION */
 
-        alert(
-            "Could not connect to the server."
-        );
+        const nutritionList =
+            document.getElementById(
+                "nutritionList"
+            );
 
+        if (nutritionList) {
+
+            nutritionList.innerHTML =
+                "<li>Calories: " +
+                (data.calories ?? 0) +
+                " kcal</li>" +
+
+                "<li>Protein: " +
+                (data.protein ?? 0) +
+                " g</li>" +
+
+                "<li>Carbs: " +
+                (data.carbs ?? 0) +
+                " g</li>" +
+
+                "<li>Fat: " +
+                (data.fat ?? 0) +
+                " g</li>";
+        }
     }
 
-}
 
-/*
-=====================================================
-HEART CLICK
-=====================================================
-*/
+    /* =========================
+       FAVOURITE STATUS
+    ========================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+    async function loadFavouriteStatus() {
 
         const heart =
             document.getElementById(
                 "heart"
             );
 
-        if (heart) {
-
-            heart.addEventListener(
-                "click",
-                toggleFavourite
-            );
-
+        if (!heart) {
+            return;
         }
 
-        loadRecipe();
+        if (!isLoggedIn()) {
 
+            updateHeart(false);
+
+            return;
+        }
+
+
+        try {
+
+            const favourites =
+                await getFavourites();
+
+            const isFavourite =
+                Array.isArray(favourites) &&
+                favourites.some(
+                    function (item) {
+
+                        return Number(
+                            item.id
+                        ) ===
+                        Number(recipeId);
+                    }
+                );
+
+            updateHeart(
+                isFavourite
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Favourite status error:",
+                error
+            );
+
+            updateHeart(false);
+        }
     }
-);
+
+
+    /* =========================
+       HEART
+    ========================= */
+
+    function updateHeart(isFavourite) {
+
+        const heart =
+            document.getElementById(
+                "heart"
+            );
+
+        if (!heart) {
+            return;
+        }
+
+        if (isFavourite) {
+
+            heart.src =
+                "images/icons/HeartFilled.png";
+
+            heart.alt =
+                "Remove from favourites";
+
+        } else {
+
+            heart.src =
+                "images/icons/HeartUnfilled.png";
+
+            heart.alt =
+                "Add to favourites";
+        }
+    }
+
+
+    /* =========================
+       TOGGLE FAVOURITE
+    ========================= */
+
+    async function toggleFavourite() {
+
+        if (!isLoggedIn()) {
+
+            alert(
+                "Please log in first."
+            );
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        if (!recipe) {
+            return;
+        }
+
+
+        try {
+
+            const favourites =
+                await getFavourites();
+
+            const alreadyFavourite =
+                Array.isArray(favourites) &&
+                favourites.some(
+                    function (item) {
+
+                        return Number(
+                            item.id
+                        ) ===
+                        Number(recipe.id);
+                    }
+                );
+
+
+            if (alreadyFavourite) {
+
+                await removeFavourite(
+                    recipe.id
+                );
+
+                updateHeart(false);
+
+            } else {
+
+                await addFavourite(
+                    recipe.id
+                );
+
+                updateHeart(true);
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Favourite error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Could not update favourite."
+            );
+        }
+    }
+
+
+    /* =========================
+       LOAD RECIPE
+    ========================= */
+
+    async function loadRecipe() {
+
+        if (
+            !Number.isInteger(recipeId) ||
+            recipeId <= 0
+        ) {
+
+            showError(
+                "Invalid recipe ID."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            recipe =
+                await getRecipe(
+                    recipeId
+                );
+
+            displayRecipe(
+                recipe
+            );
+
+            await loadFavouriteStatus();
+
+        } catch (error) {
+
+            console.error(
+                "Load recipe error:",
+                error
+            );
+
+            showError(
+                error.message ||
+                "Could not load recipe."
+            );
+        }
+    }
+
+
+    /* =========================
+       HEART CLICK
+    ========================= */
+
+    const heart =
+        document.getElementById(
+            "heart"
+        );
+
+    if (heart) {
+
+        heart.addEventListener(
+            "click",
+            toggleFavourite
+        );
+    }
+
+
+    loadRecipe();
+
+});

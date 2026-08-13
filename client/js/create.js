@@ -1,151 +1,482 @@
-const imageInput = document.getElementById("imageInput");
-const preview = document.getElementById("preview");
+const imageInput =
+    document.getElementById("imageInput");
 
-if (imageInput) {
-    imageInput.addEventListener("change", function () {
-        const file = this.files[0];
-        if (file) {
-            preview.src = URL.createObjectURL(file);
-            const overlay = document.querySelector(".upload-overlay");
+const preview =
+    document.getElementById("preview");
+
+if (imageInput && preview) {
+
+    imageInput.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            if (!file.type.startsWith("image/")) {
+                alert("Please select an image file.");
+                this.value = "";
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Image must be smaller than 5 MB.");
+                this.value = "";
+                return;
+            }
+
+            preview.src =
+                URL.createObjectURL(file);
+
+            const overlay =
+                document.querySelector(
+                    ".upload-overlay"
+                );
+
             if (overlay) {
                 overlay.style.opacity = "0";
             }
         }
-    });
+    );
 }
 
 
-// Add ingredient
-const ingredientList = document.getElementById("ingredientList");
-const addIngredient = document.getElementById("addIngredient");
+/* =====================================================
+   INGREDIENTS
+===================================================== */
 
-if (addIngredient) {
-    addIngredient.addEventListener("click", function () {
-        const div = document.createElement("div");
-        div.className = "ingredient-row";
-        div.innerHTML = `
-            <input type="text" class="ingredient" placeholder="Ingredient">
-            <button type="button" class="remove-btn">✕</button>
-        `;
-        ingredientList.appendChild(div);
-    });
+const ingredientList =
+    document.getElementById(
+        "ingredientList"
+    );
+
+const addIngredient =
+    document.getElementById(
+        "addIngredient"
+    );
+
+if (addIngredient && ingredientList) {
+
+    addIngredient.addEventListener(
+        "click",
+        function () {
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "ingredient-row";
+
+            row.innerHTML = `
+                <input
+                    type="text"
+                    class="ingredient"
+                    placeholder="Ingredient"
+                >
+
+                <button
+                    type="button"
+                    class="remove-btn"
+                >
+                    ✕
+                </button>
+            `;
+
+            ingredientList.appendChild(row);
+        }
+    );
 }
 
-// Add Step
-const stepList = document.getElementById("stepList");
-const addStep = document.getElementById("addStep");
 
-if (addStep) {
-    addStep.addEventListener("click", function () {
-        const div = document.createElement("div");
-        div.className = "step-row";
-        div.innerHTML = `
-            <textarea class="step" placeholder="Write a step."></textarea>
-            <button type="button" class="remove-btn">✕</button>
-        `;
-        stepList.appendChild(div);
-    });
+/* =====================================================
+   INSTRUCTIONS
+===================================================== */
+
+const stepList =
+    document.getElementById(
+        "stepList"
+    );
+
+const addStep =
+    document.getElementById(
+        "addStep"
+    );
+
+if (addStep && stepList) {
+
+    addStep.addEventListener(
+        "click",
+        function () {
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "step-row";
+
+            row.innerHTML = `
+                <textarea
+                    class="step"
+                    placeholder="Write a step."
+                ></textarea>
+
+                <button
+                    type="button"
+                    class="remove-btn"
+                >
+                    ✕
+                </button>
+            `;
+
+            stepList.appendChild(row);
+        }
+    );
 }
 
-// Remove
-document.addEventListener("click", function (e) {
-    if (e.target.classList.contains("remove-btn")) {
-        e.target.parentElement.remove();
+
+/* =====================================================
+   REMOVE INGREDIENT / STEP
+===================================================== */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        if (
+            event.target.classList.contains(
+                "remove-btn"
+            )
+        ) {
+
+            const parent =
+                event.target.parentElement;
+
+            if (parent) {
+                parent.remove();
+            }
+        }
     }
-});
+);
 
-// Publish Recipe
-const recipeForm = document.getElementById("recipeForm");
+
+/* =====================================================
+   CREATE RECIPE
+===================================================== */
+
+const recipeForm =
+    document.getElementById(
+        "recipeForm"
+    );
+
 if (recipeForm) {
-    recipeForm.addEventListener("submit",
-        async function (e) {
-            e.preventDefault();
-            const title = document.getElementById("title").value.trim();
-            const description = document.getElementById("description").value.trim();
-            const categoryElement = document.getElementById("category");
-            const category = categoryElement ? categoryElement.value : "";
-            const time = document.getElementById("time").value.trim();
-            const servings = document.getElementById("servings").value.trim();
-            const difficultyElement = document.getElementById("difficulty");
-            const difficulty = difficultyElement ? difficultyElement.value : "Easy";
-            const caloriesElement = document.getElementById("calories");
-            const proteinElement = document.getElementById("protein");
-            const carbsElement = document.getElementById("carbs");
-            const fatElement = document.getElementById("fat");
-            const calories = caloriesElement ? caloriesElement.value : 0;
-            const protein = proteinElement ? proteinElement.value : 0;
-            const carbs = carbsElement ? carbsElement.value : 0;
-            const fat = fatElement ? fatElement.value : 0;
 
-            if (title === "" || description === "" || time === "" || servings === "") {
-                alert("Please fill in all required fields.");
+    recipeForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            if (!isLoggedIn()) {
+
+                alert(
+                    "Please login before creating a recipe."
+                );
+
+                window.location.href =
+                    "login.html";
+
                 return;
             }
 
-            // Login Check
-            const userId = localStorage.getItem("userId");
-            if (!userId) {
-                alert("Please login before creating a recipe.");
-                window.location.href = "login.html";
+
+            const title =
+                document
+                    .getElementById("title")
+                    .value
+                    .trim();
+
+            const description =
+                document
+                    .getElementById("description")
+                    .value
+                    .trim();
+
+            const categoryElement =
+                document.getElementById(
+                    "category"
+                );
+
+            const time =
+                document
+                    .getElementById("time")
+                    .value
+                    .trim();
+
+            const servings =
+                document
+                    .getElementById("servings")
+                    .value
+                    .trim();
+
+            const difficultyElement =
+                document.getElementById(
+                    "difficulty"
+                );
+
+            const caloriesElement =
+                document.getElementById(
+                    "calories"
+                );
+
+            const proteinElement =
+                document.getElementById(
+                    "protein"
+                );
+
+            const carbsElement =
+                document.getElementById(
+                    "carbs"
+                );
+
+            const fatElement =
+                document.getElementById(
+                    "fat"
+                );
+
+
+            const category =
+                categoryElement
+                    ? categoryElement.value.trim()
+                    : "";
+
+            const difficulty =
+                difficultyElement
+                    ? difficultyElement.value
+                    : "Easy";
+
+            const calories =
+                caloriesElement
+                    ? caloriesElement.value
+                    : "0";
+
+            const protein =
+                proteinElement
+                    ? proteinElement.value
+                    : "0";
+
+            const carbs =
+                carbsElement
+                    ? carbsElement.value
+                    : "0";
+
+            const fat =
+                fatElement
+                    ? fatElement.value
+                    : "0";
+
+
+            if (
+                title.length < 2 ||
+                description.length < 5 ||
+                !time ||
+                !servings
+            ) {
+
+                alert(
+                    "Please fill in all required fields."
+                );
+
                 return;
             }
+
 
             const ingredients = [];
-            document.querySelectorAll(".ingredient").forEach(function (item) {
-                    const value = item.value.trim();
-                    if (value !== "") {
-                        ingredients.push(value);
+
+            document
+                .querySelectorAll(
+                    ".ingredient"
+                )
+                .forEach(
+                    function (input) {
+
+                        const value =
+                            input.value.trim();
+
+                        if (value) {
+                            ingredients.push(value);
+                        }
                     }
-                });
+                );
+
 
             const instructions = [];
-            document.querySelectorAll(".step").forEach(function (item) {
-                    const value = item.value.trim();
-                    if (value !== "") {
-                        instructions.push(value);
+
+            document
+                .querySelectorAll(
+                    ".step"
+                )
+                .forEach(
+                    function (input) {
+
+                        const value =
+                            input.value.trim();
+
+                        if (value) {
+                            instructions.push(value);
+                        }
                     }
-                });
+                );
 
-            const formData = new FormData();
-            formData.append("user_id", userId);
-            formData.append("title", title);
-            formData.append("description", description);
-            formData.append("category", category);
-            formData.append("time", time);
-            formData.append("servings", servings);
-            formData.append("difficulty", difficulty);
-            formData.append("calories", calories);
-            formData.append("protein", protein);
-            formData.append("carbs", carbs);
-            formData.append("fat", fat);
-            formData.append("ingredients", JSON.stringify(ingredients));
-            formData.append("instructions", JSON.stringify(instructions));
 
-            if (imageInput && imageInput.files && imageInput.files.length > 0) {
-                formData.append("image", imageInput.files[0]);
+            if (ingredients.length === 0) {
+
+                alert(
+                    "Please add at least one ingredient."
+                );
+
+                return;
             }
 
-            // Send to Server
-            try {
-                const response = await fetch("http://localhost:3000/api/recipes",
-                        {
-                            method: "POST",
-                            body: formData
-                        }
-                    );
-                const data = await response.json();
 
-                if (!response.ok) {
-                    console.error("Create recipe error:", data);
-                    alert(data.message || "Could not create recipe.");
-                    return;
-                }
-                console.log("Recipe created:", data);
-                alert("Recipe published successfully!");
-                window.location.href = "myrecipes.html";
+            if (instructions.length === 0) {
+
+                alert(
+                    "Please add at least one instruction."
+                );
+
+                return;
+            }
+
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "title",
+                title
+            );
+
+            formData.append(
+                "description",
+                description
+            );
+
+            formData.append(
+                "category",
+                category
+            );
+
+            formData.append(
+                "time",
+                time
+            );
+
+            formData.append(
+                "servings",
+                servings
+            );
+
+            formData.append(
+                "difficulty",
+                difficulty
+            );
+
+            formData.append(
+                "calories",
+                calories
+            );
+
+            formData.append(
+                "protein",
+                protein
+            );
+
+            formData.append(
+                "carbs",
+                carbs
+            );
+
+            formData.append(
+                "fat",
+                fat
+            );
+
+            formData.append(
+                "ingredients",
+                JSON.stringify(ingredients)
+            );
+
+            formData.append(
+                "instructions",
+                JSON.stringify(instructions)
+            );
+
+
+            if (
+                imageInput &&
+                imageInput.files &&
+                imageInput.files.length > 0
+            ) {
+
+                formData.append(
+                    "image",
+                    imageInput.files[0]
+                );
+            }
+
+
+            const submitButton =
+                recipeForm.querySelector(
+                    'button[type="submit"]'
+                );
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent =
+                    "Publishing...";
+            }
+
+
+            try {
+
+                const result =
+                    await createRecipe(
+                        formData
+                    );
+
+                console.log(
+                    "Recipe created:",
+                    result
+                );
+
+                alert(
+                    "Recipe published successfully!"
+                );
+
+                window.location.href =
+                    "myrecipes.html";
+
             } catch (error) {
-                console.error("Publish recipe error:", error);
-                alert("Could not connect to the server.");
+
+                console.error(
+                    "Create recipe error:",
+                    error
+                );
+
+                alert(
+                    error.message ||
+                    "Could not create recipe."
+                );
+
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent =
+                        "Publish Recipe";
+                }
             }
         }
     );
