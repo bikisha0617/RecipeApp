@@ -3,38 +3,24 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-const {
-    sequelize,
-    connectDatabase
-} = require("./database");
+const { sequelize, connectDatabase } = require("./database");
 
-// Import models so Sequelize knows about them
 require("./models");
 
-// Routes
 const authRoutes = require("./routes/auth");
 const recipeRoutes = require("./routes/recipes");
 const favouriteRoutes = require("./routes/favourites");
 const userRoutes = require("./routes/users");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
-const PORT =
-    Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
+const clientDir = path.join(__dirname, "..", "client");
+const uploadsDir = path.join(__dirname, "uploads");
 
-/*
-====================================================
-MIDDLEWARE
-====================================================
-*/
-
-app.use(
-    cors({
-        origin: true,
-        credentials: true
-    })
-);
+app.use(cors());
 
 app.use(
     express.json({
@@ -49,131 +35,61 @@ app.use(
     })
 );
 
-
 /*
 ====================================================
-SERVE UPLOADED IMAGES
+STATIC FILES
 ====================================================
 */
 
 app.use(
     "/uploads",
-    express.static(
-        path.join(__dirname, "uploads")
-    )
+    express.static(uploadsDir)
 );
-
-
-/*
-====================================================
-SERVE SEEDED / STATIC IMAGES
-====================================================
-*/
 
 app.use(
-    "/images",
-    express.static(
-        path.join(__dirname, "images")
-    )
+    express.static(clientDir)
 );
-
 
 /*
 ====================================================
-TEST ROUTE
+HEALTH
 ====================================================
 */
 
-app.get(
-    "/",
-    function (req, res) {
+app.get("/api/health", async function (req, res) {
+    try {
+        await sequelize.authenticate();
 
         return res.json({
-            message:
-                "Recipe App backend is running!",
-            status:
-                "ok"
+            status: "ok",
+            database: "connected"
         });
+    } catch (error) {
+        console.error("Health check error:", error);
 
+        return res.status(503).json({
+            status: "error",
+            database: "disconnected"
+        });
     }
-);
+});
 
+app.get("/api/test-db", async function (req, res) {
+    try {
+        await sequelize.authenticate();
 
-/*
-====================================================
-HEALTH CHECK
-====================================================
-*/
+        return res.json({
+            message: "SQLite is working with Sequelize!",
+            database: "Connected"
+        });
+    } catch (error) {
+        console.error("Database test error:", error);
 
-app.get(
-    "/api/health",
-    async function (req, res) {
-
-        try {
-
-            await sequelize.authenticate();
-
-            return res.json({
-                status: "ok",
-                database: "connected"
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Health check database error:",
-                error
-            );
-
-            return res.status(503).json({
-                status: "error",
-                database: "disconnected"
-            });
-
-        }
-
+        return res.status(500).json({
+            message: "Database connection failed."
+        });
     }
-);
-
-
-/*
-====================================================
-DATABASE TEST
-====================================================
-*/
-
-app.get(
-    "/api/test-db",
-    async function (req, res) {
-
-        try {
-
-            await sequelize.authenticate();
-
-            return res.json({
-                message:
-                    "SQLite is working with Sequelize!",
-                database:
-                    "Connected"
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Database test error:",
-                error
-            );
-
-            return res.status(500).json({
-                message:
-                    "Database connection failed."
-            });
-
-        }
-
-    }
-);
-
+});
 
 /*
 ====================================================
@@ -181,76 +97,76 @@ API ROUTES
 ====================================================
 */
 
-app.use(
-    "/api/auth",
-    authRoutes
-);
+app.use("/api/auth", authRoutes);
 
-app.use(
-    "/api/recipes",
-    recipeRoutes
-);
+app.use("/api/recipes", recipeRoutes);
 
-app.use(
-    "/api/favourites",
-    favouriteRoutes
-);
+app.use("/api/favourites", favouriteRoutes);
 
-app.use(
-    "/api/users",
-    userRoutes
-);
+app.use("/api/users", userRoutes);
 
+app.use("/api/admin", adminRoutes);
 
 /*
 ====================================================
-404 HANDLER
+API ROOT
 ====================================================
 */
 
-app.use(
-    function (req, res) {
-
-        return res.status(404).json({
-            message:
-                "API route not found."
-        });
-
-    }
-);
-
+app.get("/api", function (req, res) {
+    return res.json({
+        message: "Recipe App API is running.",
+        status: "ok"
+    });
+});
 
 /*
 ====================================================
-GENERAL ERROR HANDLER
+UNKNOWN API ROUTE
 ====================================================
 */
 
-app.use(
-    function (error, req, res, next) {
+app.use("/api", function (req, res) {
+    return res.status(404).json({
+        message: "API route not found."
+    });
+});
 
-        console.error(
-            "Server error:",
-            error
-        );
+/*
+====================================================
+FRONTEND FALLBACK
+====================================================
+*/
 
-        if (res.headersSent) {
-            return next(error);
-        }
-
-        return res.status(
-            error.status || 500
-        ).json({
-
-            message:
-                error.message ||
-                "Internal server error."
-
-        });
-
+app.get(/.*/, function (req, res, next) {
+    if (req.path.startsWith("/api/")) {
+        return next();
     }
-);
 
+    return res.sendFile(
+        path.join(clientDir, "index.html")
+    );
+});
+
+/*
+====================================================
+ERROR HANDLER
+====================================================
+*/
+
+app.use(function (error, req, res, next) {
+    console.error("Server error:", error);
+
+    if (res.headersSent) {
+        return next(error);
+    }
+
+    return res.status(error.status || 500).json({
+        message:
+            error.message ||
+            "Internal server error."
+    });
+});
 
 /*
 ====================================================
@@ -259,79 +175,32 @@ START SERVER
 */
 
 async function startServer() {
-
     try {
-
-        /*
-        --------------------------------------------
-        Connect to SQLite
-        --------------------------------------------
-        */
-
-        const connected =
-            await connectDatabase();
+        const connected = await connectDatabase();
 
         if (!connected) {
-
-            console.error(
-                "Server could not connect to database."
-            );
-
             process.exit(1);
-
         }
-
-
-        /*
-        --------------------------------------------
-        Synchronize Sequelize models
-        --------------------------------------------
-        */
 
         await sequelize.sync();
 
-        console.log(
-            "Sequelize models synchronized."
-        );
+        app.listen(PORT, function () {
+            console.log(
+                `Recipe App running at http://localhost:${PORT}`
+            );
 
-
-        /*
-        --------------------------------------------
-        Start Express
-        --------------------------------------------
-        */
-
-        app.listen(
-            PORT,
-            function () {
-
-                console.log(
-                    `Server running at http://localhost:${PORT}`
-                );
-
-                console.log(
-                    `Uploaded images available at http://localhost:${PORT}/uploads/`
-                );
-
-                console.log(
-                    `Static images available at http://localhost:${PORT}/images/`
-                );
-
-            }
-        );
-
+            console.log(
+                `API available at http://localhost:${PORT}/api`
+            );
+        });
     } catch (error) {
-
         console.error(
             "Could not start server:",
             error
         );
 
         process.exit(1);
-
     }
-
 }
-
 
 startServer();

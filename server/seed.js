@@ -1017,6 +1017,4 @@ async function seedDatabase() {
     }
 
 }
-
-
 seedDatabase();
