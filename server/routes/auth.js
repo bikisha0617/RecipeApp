@@ -2,411 +2,734 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const router = express.Router();
-
 const {
-    User
+    User,
+    Admin
 } = require("../models");
 
+require("dotenv").config();
+
+const router = express.Router();
+
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "2h";
 
 
 /*
-=====================================================
-VALIDATION FUNCTIONS
-=====================================================
+====================================================
+CHECK JWT SECRET
+====================================================
 */
 
-function validateName(name) {
+if (!JWT_SECRET) {
 
-    if (!name || typeof name !== "string") {
-        return "Name is required.";
-    }
+    throw new Error(
+        "JWT_SECRET is missing from .env"
+    );
 
-    const cleanName = name.trim();
-
-    if (cleanName.length < 2) {
-        return "Name must be at least 2 characters long.";
-    }
-
-    if (cleanName.length > 100) {
-        return "Name cannot exceed 100 characters.";
-    }
-
-    return null;
 }
 
 
-function validateEmail(email) {
+/*
+====================================================
+VALIDATE EMAIL
+====================================================
+*/
 
-    if (!email || typeof email !== "string") {
-        return "Email is required.";
-    }
+function isValidEmail(email) {
 
-    const cleanEmail = email.trim().toLowerCase();
-
-    const emailPattern =
+    const emailRegex =
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailPattern.test(cleanEmail)) {
-        return "Please provide a valid email address.";
-    }
+    return emailRegex.test(email);
 
-    return null;
-}
-
-
-function validatePassword(password) {
-
-    if (!password || typeof password !== "string") {
-        return "Password is required.";
-    }
-
-    if (password.length < 8) {
-        return "Password must be at least 8 characters long.";
-    }
-
-    if (password.length > 100) {
-        return "Password cannot exceed 100 characters.";
-    }
-
-    return null;
 }
 
 
 /*
-=====================================================
-CREATE USER JWT
-=====================================================
+====================================================
+CREATE JWT
+====================================================
 */
 
-function createUserToken(user) {
+function createToken(payload) {
 
     return jwt.sign(
-        {
-            id: user.id,
-            email: user.email,
-            type: "user"
-        },
+        payload,
         JWT_SECRET,
         {
-            expiresIn: JWT_EXPIRES_IN
+            expiresIn: "2h"
         }
     );
+
 }
 
 
 /*
-=====================================================
-REGISTER
-=====================================================
+====================================================
+USER REGISTER
+====================================================
 */
 
-router.post("/register", async function (req, res) {
+router.post(
+    "/register",
+    async function (req, res) {
 
-    try {
+        try {
 
-        const {
-            name,
-            email,
-            password
-        } = req.body;
-
-
-        /*
-        ---------------------------------------------
-        VALIDATION
-        ---------------------------------------------
-        */
-
-        const nameError =
-            validateName(name);
-
-        if (nameError) {
-            return res.status(400).json({
-                message: nameError
-            });
-        }
+            const {
+                name,
+                email,
+                password
+            } = req.body;
 
 
-        const emailError =
-            validateEmail(email);
+            /*
+            ----------------------------------------
+            Validation
+            ----------------------------------------
+            */
 
-        if (emailError) {
-            return res.status(400).json({
-                message: emailError
-            });
-        }
+            if (
+                typeof name !== "string" ||
+                typeof email !== "string" ||
+                typeof password !== "string"
+            ) {
 
+                return res.status(400).json({
+                    message:
+                        "Name, email and password are required."
+                });
 
-        const passwordError =
-            validatePassword(password);
-
-        if (passwordError) {
-            return res.status(400).json({
-                message: passwordError
-            });
-        }
-
-
-        const cleanName =
-            name.trim();
-
-        const cleanEmail =
-            email.trim().toLowerCase();
+            }
 
 
-        /*
-        ---------------------------------------------
-        CHECK EXISTING USER
-        ---------------------------------------------
-        */
+            const cleanName =
+                name.trim();
 
-        const existingUser =
-            await User.findOne({
-                where: {
-                    email: cleanEmail
-                }
-            });
+            const cleanEmail =
+                email.trim().toLowerCase();
 
 
-        if (existingUser) {
-            return res.status(409).json({
+            if (cleanName.length < 2) {
+
+                return res.status(400).json({
+                    message:
+                        "Name must be at least 2 characters long."
+                });
+
+            }
+
+
+            if (cleanName.length > 100) {
+
+                return res.status(400).json({
+                    message:
+                        "Name cannot exceed 100 characters."
+                });
+
+            }
+
+
+            if (!isValidEmail(cleanEmail)) {
+
+                return res.status(400).json({
+                    message:
+                        "Please provide a valid email address."
+                });
+
+            }
+
+
+            if (password.length < 6) {
+
+                return res.status(400).json({
+                    message:
+                        "Password must be at least 6 characters long."
+                });
+
+            }
+
+
+            if (password.length > 100) {
+
+                return res.status(400).json({
+                    message:
+                        "Password cannot exceed 100 characters."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Check existing user
+            ----------------------------------------
+            */
+
+            const existingUser =
+                await User.findOne({
+                    where: {
+                        email: cleanEmail
+                    }
+                });
+
+
+            if (existingUser) {
+
+                return res.status(409).json({
+                    message:
+                        "An account with this email already exists."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Hash password
+            ----------------------------------------
+            */
+
+            const hashedPassword =
+                await bcrypt.hash(
+                    password,
+                    12
+                );
+
+
+            /*
+            ----------------------------------------
+            Create user
+            ----------------------------------------
+            */
+
+            const user =
+                await User.create({
+
+                    name: cleanName,
+
+                    email: cleanEmail,
+
+                    password:
+                        hashedPassword
+
+                });
+
+
+            /*
+            ----------------------------------------
+            Response
+            ----------------------------------------
+            */
+
+            return res.status(201).json({
+
                 message:
-                    "An account with this email already exists."
+                    "Account created successfully.",
+
+                user: {
+
+                    id: user.id,
+
+                    name: user.name,
+
+                    email: user.email
+
+                }
+
             });
-        }
 
+        } catch (error) {
 
-        /*
-        ---------------------------------------------
-        HASH PASSWORD
-        ---------------------------------------------
-        */
-
-        const passwordHash =
-            await bcrypt.hash(
-                password,
-                12
+            console.error(
+                "Registration error:",
+                error
             );
 
-
-        /*
-        ---------------------------------------------
-        CREATE USER
-        ---------------------------------------------
-        */
-
-        const user =
-            await User.create({
-                name: cleanName,
-                email: cleanEmail,
-                password: passwordHash
-            });
-
-
-        /*
-        ---------------------------------------------
-        RESPONSE
-        ---------------------------------------------
-        */
-
-        return res.status(201).json({
-
-            message:
-                "Account created successfully.",
-
-            userId:
-                user.id
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Registration error:",
-            error
-        );
-
-
-        /*
-        Sequelize validation error
-        */
-
-        if (
-            error.name ===
-            "SequelizeValidationError"
-        ) {
-
-            return res.status(400).json({
+            return res.status(500).json({
                 message:
-                    error.errors
-                        .map(function (item) {
-                            return item.message;
-                        })
-                        .join(" ")
+                    "Could not create account."
             });
+
         }
 
-
-        /*
-        Duplicate email
-        */
-
-        if (
-            error.name ===
-            "SequelizeUniqueConstraintError"
-        ) {
-
-            return res.status(409).json({
-                message:
-                    "An account with this email already exists."
-            });
-        }
-
-
-        return res.status(500).json({
-            message:
-                "Could not create account."
-        });
     }
-});
+);
 
 
 /*
-=====================================================
-LOGIN
-=====================================================
+====================================================
+USER LOGIN
+====================================================
 */
 
-router.post("/login", async function (req, res) {
+router.post(
+    "/login",
+    async function (req, res) {
 
-    try {
+        try {
 
-        const {
-            email,
-            password
-        } = req.body;
-
-
-        /*
-        ---------------------------------------------
-        VALIDATION
-        ---------------------------------------------
-        */
-
-        const emailError =
-            validateEmail(email);
-
-        if (emailError) {
-            return res.status(400).json({
-                message: emailError
-            });
-        }
+            const {
+                email,
+                password
+            } = req.body;
 
 
-        const passwordError =
-            validatePassword(password);
+            /*
+            ----------------------------------------
+            Validation
+            ----------------------------------------
+            */
 
-        if (passwordError) {
-            return res.status(400).json({
-                message: passwordError
-            });
-        }
+            if (
+                typeof email !== "string" ||
+                typeof password !== "string"
+            ) {
 
+                return res.status(400).json({
+                    message:
+                        "Email and password are required."
+                });
 
-        const cleanEmail =
-            email.trim().toLowerCase();
-
-
-        /*
-        ---------------------------------------------
-        FIND USER
-        ---------------------------------------------
-        */
-
-        const user =
-            await User.findOne({
-                where: {
-                    email: cleanEmail
-                }
-            });
-
-
-        if (!user) {
-            return res.status(401).json({
-                message:
-                    "Invalid email or password."
-            });
-        }
-
-
-        /*
-        ---------------------------------------------
-        COMPARE PASSWORD
-        ---------------------------------------------
-        */
-
-        const passwordMatches =
-            await bcrypt.compare(
-                password,
-                user.password
-            );
-
-
-        if (!passwordMatches) {
-            return res.status(401).json({
-                message:
-                    "Invalid email or password."
-            });
-        }
-
-
-        /*
-        ---------------------------------------------
-        CREATE JWT
-        ---------------------------------------------
-        */
-
-        const token =
-            createUserToken(user);
-
-
-        /*
-        ---------------------------------------------
-        RESPONSE
-        ---------------------------------------------
-        */
-
-        return res.json({
-
-            message:
-                "Login successful.",
-
-            token: token,
-
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email
             }
 
-        });
 
-    } catch (error) {
+            const cleanEmail =
+                email.trim().toLowerCase();
 
-        console.error(
-            "Login error:",
-            error
-        );
 
-        return res.status(500).json({
-            message:
-                "Could not login."
-        });
+            if (!isValidEmail(cleanEmail)) {
+
+                return res.status(400).json({
+                    message:
+                        "Please provide a valid email address."
+                });
+
+            }
+
+
+            if (password.length === 0) {
+
+                return res.status(400).json({
+                    message:
+                        "Password is required."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Find user
+            ----------------------------------------
+            */
+
+            const user =
+                await User.findOne({
+                    where: {
+                        email: cleanEmail
+                    }
+                });
+
+
+            if (!user) {
+
+                return res.status(401).json({
+                    message:
+                        "Invalid email or password."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Compare password
+            ----------------------------------------
+            */
+
+            const passwordMatches =
+                await bcrypt.compare(
+                    password,
+                    user.password
+                );
+
+
+            if (!passwordMatches) {
+
+                return res.status(401).json({
+                    message:
+                        "Invalid email or password."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Create JWT
+            ----------------------------------------
+            */
+
+            const token =
+                createToken({
+
+                    id: user.id,
+
+                    email: user.email,
+
+                    role: "user"
+
+                });
+
+
+            /*
+            ----------------------------------------
+            Response
+            ----------------------------------------
+            */
+
+            return res.json({
+
+                message:
+                    "Login successful.",
+
+                token: token,
+
+                user: {
+
+                    id: user.id,
+
+                    name: user.name,
+
+                    email: user.email
+
+                }
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Login error:",
+                error
+            );
+
+            return res.status(500).json({
+                message:
+                    "Could not log in."
+            });
+
+        }
+
     }
-});
+);
+
+
+/*
+====================================================
+ADMIN LOGIN
+====================================================
+*/
+
+router.post(
+    "/admin/login",
+    async function (req, res) {
+
+        try {
+
+            const {
+                username,
+                password
+            } = req.body;
+
+
+            /*
+            ----------------------------------------
+            Validation
+            ----------------------------------------
+            */
+
+            if (
+                typeof username !== "string" ||
+                typeof password !== "string"
+            ) {
+
+                return res.status(400).json({
+                    message:
+                        "Username and password are required."
+                });
+
+            }
+
+
+            const cleanUsername =
+                username.trim();
+
+
+            if (cleanUsername.length < 3) {
+
+                return res.status(400).json({
+                    message:
+                        "Username must be at least 3 characters long."
+                });
+
+            }
+
+
+            if (password.length === 0) {
+
+                return res.status(400).json({
+                    message:
+                        "Password is required."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Find admin
+            ----------------------------------------
+            */
+
+            const admin =
+                await Admin.findOne({
+                    where: {
+                        username:
+                            cleanUsername
+                    }
+                });
+
+
+            if (!admin) {
+
+                return res.status(401).json({
+                    message:
+                        "Invalid username or password."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Compare hashed password
+            ----------------------------------------
+            */
+
+            const passwordMatches =
+                await bcrypt.compare(
+                    password,
+                    admin.password
+                );
+
+
+            if (!passwordMatches) {
+
+                return res.status(401).json({
+                    message:
+                        "Invalid username or password."
+                });
+
+            }
+
+
+            /*
+            ----------------------------------------
+            Create admin JWT
+            ----------------------------------------
+            */
+
+            const token =
+                createToken({
+
+                    id: admin.id,
+
+                    username:
+                        admin.username,
+
+                    role: "admin"
+
+                });
+
+
+            /*
+            ----------------------------------------
+            Response
+            ----------------------------------------
+            */
+
+            return res.json({
+
+                message:
+                    "Admin login successful.",
+
+                token: token,
+
+                admin: {
+
+                    id: admin.id,
+
+                    username:
+                        admin.username,
+
+                    role: "admin"
+
+                }
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Admin login error:",
+                error
+            );
+
+            return res.status(500).json({
+                message:
+                    "Could not log in as administrator."
+            });
+
+        }
+
+    }
+);
+
+
+/*
+====================================================
+VERIFY CURRENT TOKEN
+====================================================
+*/
+
+router.get(
+    "/me",
+    async function (req, res) {
+
+        const authHeader =
+            req.headers.authorization;
+
+
+        if (!authHeader) {
+
+            return res.status(401).json({
+                message:
+                    "Authentication required."
+            });
+
+        }
+
+
+        if (
+            !authHeader.startsWith("Bearer ")
+        ) {
+
+            return res.status(401).json({
+                message:
+                    "Invalid authorization format."
+            });
+
+        }
+
+
+        const token =
+            authHeader.split(" ")[1];
+
+
+        try {
+
+            const decoded =
+                jwt.verify(
+                    token,
+                    JWT_SECRET
+                );
+
+
+            if (decoded.role === "admin") {
+
+                const admin =
+                    await Admin.findByPk(
+                        decoded.id
+                    );
+
+
+                if (!admin) {
+
+                    return res.status(401).json({
+                        message:
+                            "Admin account no longer exists."
+                    });
+
+                }
+
+
+                return res.json({
+
+                    authenticated: true,
+
+                    role: "admin",
+
+                    admin: {
+
+                        id: admin.id,
+
+                        username:
+                            admin.username
+
+                    }
+
+                });
+
+            }
+
+
+            const user =
+                await User.findByPk(
+                    decoded.id
+                );
+
+
+            if (!user) {
+
+                return res.status(401).json({
+                    message:
+                        "User account no longer exists."
+                });
+
+            }
+
+
+            return res.json({
+
+                authenticated: true,
+
+                role: "user",
+
+                user: {
+
+                    id: user.id,
+
+                    name: user.name,
+
+                    email: user.email
+
+                }
+
+            });
+
+        } catch (error) {
+
+            return res.status(401).json({
+                message:
+                    "Invalid or expired token."
+            });
+
+        }
+
+    }
+);
 
 
 module.exports = router;

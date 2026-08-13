@@ -1,76 +1,64 @@
 const { DataTypes } = require("sequelize");
+const { sequelize } = require("../database");
 
+const User = sequelize.define(
+    "User",
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
 
-module.exports = function (sequelize) {
-
-    const User = sequelize.define(
-        "User",
-        {
-            id: {
-                type: DataTypes.INTEGER,
-                primaryKey: true,
-                autoIncrement: true
-            },
-
-            name: {
-                type: DataTypes.STRING(100),
-                allowNull: false,
-
-                validate: {
-                    notEmpty: {
-                        msg: "Name is required."
-                    },
-
-                    len: {
-                        args: [2, 100],
-                        msg: "Name must be between 2 and 100 characters."
-                    }
+        name: {
+            type: DataTypes.STRING(100),
+            allowNull: false,
+            validate: {
+                notEmpty: {
+                    msg: "Name is required."
+                },
+                len: {
+                    args: [2, 100],
+                    msg: "Name must be between 2 and 100 characters."
                 }
-            },
-
-            email: {
-                type: DataTypes.STRING(150),
-                allowNull: false,
-                unique: true,
-
-                validate: {
-                    isEmail: {
-                        msg: "Please provide a valid email address."
-                    }
-                }
-            },
-
-            password: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-
-                validate: {
-                    notEmpty: {
-                        msg: "Password is required."
-                    }
-                }
-            },
-
-            notifications: {
-                type: DataTypes.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
-            },
-
-            darkMode: {
-                type: DataTypes.BOOLEAN,
-                allowNull: false,
-                defaultValue: false,
-
-                field: "darkMode"
             }
         },
-        {
-            tableName: "users",
-            timestamps: false
+
+        email: {
+            type: DataTypes.STRING(150),
+            allowNull: false,
+            unique: true,
+            validate: {
+                notEmpty: {
+                    msg: "Email is required."
+                },
+                isEmail: {
+                    msg: "Please provide a valid email address."
+                }
+            }
+        },
+
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+
+        notifications: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+
+        darkMode: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         }
-    );
+    },
+    {
+        tableName: "users",
+        timestamps: false
+    }
+);
 
-
-    return User;
-};
+module.exports = User;

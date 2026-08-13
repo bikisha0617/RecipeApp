@@ -1,68 +1,40 @@
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET;
 
-
-/*
-=====================================================
-VERIFY JWT SECRET
-=====================================================
-*/
-
-if (!JWT_SECRET) {
-    throw new Error(
-        "JWT_SECRET is missing. Please add JWT_SECRET to the .env file."
-    );
-}
-
-
-/*
-=====================================================
-AUTHENTICATE USER
-=====================================================
-
-This middleware checks:
-
-Authorization: Bearer <token>
-
-If the token is valid, the decoded user information
-is stored in:
-
-req.user
-*/
+// ====================================================
+// AUTHENTICATE JWT TOKEN
+// ====================================================
 
 function authenticateToken(req, res, next) {
 
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers["authorization"];
 
-    if (!authHeader) {
+    const token =
+        authHeader &&
+        authHeader.startsWith("Bearer ")
+            ? authHeader.split(" ")[1]
+            : null;
+
+
+    if (!token) {
+
         return res.status(401).json({
-            message: "Authentication required."
+            message: "Authentication token is required."
         });
+
     }
 
-    const parts = authHeader.split(" ");
-
-    if (
-        parts.length !== 2 ||
-        parts[0] !== "Bearer" ||
-        !parts[1]
-    ) {
-        return res.status(401).json({
-            message: "Invalid authorization header."
-        });
-    }
-
-    const token = parts[1];
 
     try {
 
-        const decoded = jwt.verify(
-            token,
-            JWT_SECRET
-        );
+        const user =
+            jwt.verify(
+                token,
+                process.env.JWT_SECRET
+            );
 
-        req.user = decoded;
+
+        req.user = user;
 
         next();
 
@@ -73,66 +45,86 @@ function authenticateToken(req, res, next) {
             error.message
         );
 
-        return res.status(401).json({
-            message: "Invalid or expired token."
+
+        return res.status(403).json({
+            message: "Invalid or expired authentication token."
         });
+
     }
+
 }
 
 
-/*
-=====================================================
-REQUIRE NORMAL USER
-=====================================================
-
-This prevents an admin token from being used as a
-normal user token when a route specifically requires
-a user.
-*/
+// ====================================================
+// REQUIRE NORMAL USER
+// ====================================================
 
 function requireUser(req, res, next) {
 
     if (!req.user) {
+
         return res.status(401).json({
             message: "Authentication required."
         });
+
     }
 
-    if (req.user.type !== "user") {
-        return res.status(403).json({
-            message: "User access required."
-        });
+
+    const userType =
+        req.user.type ||
+        req.user.role ||
+        "user";
+
+
+    if (userType === "admin") {
+
+        return next();
+
     }
+
 
     next();
+
 }
 
 
-/*
-=====================================================
-REQUIRE ADMIN
-=====================================================
-
-This protects administrative functionality.
-*/
+// ====================================================
+// REQUIRE ADMIN
+// ====================================================
 
 function requireAdmin(req, res, next) {
 
     if (!req.user) {
+
         return res.status(401).json({
             message: "Authentication required."
         });
+
     }
 
-    if (req.user.type !== "admin") {
+
+    const userType =
+        req.user.type ||
+        req.user.role;
+
+
+    if (userType !== "admin") {
+
         return res.status(403).json({
-            message: "Administrator access required."
+            message: "Admin access required."
         });
+
     }
+
 
     next();
+
 }
 
+
+// ====================================================
+// EXPORT
+// ====================================================
 
 module.exports = {
     authenticateToken,

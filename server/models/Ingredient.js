@@ -1,40 +1,35 @@
 const { DataTypes } = require("sequelize");
+const { sequelize } = require("../database");
 
+const Ingredient = sequelize.define(
+    "Ingredient",
+    {
+        id: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
 
-module.exports = function (sequelize) {
+        recipeId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            field: "recipe_id"
+        },
 
-    const Ingredient = sequelize.define(
-        "Ingredient",
-        {
-            id: {
-                type: DataTypes.INTEGER,
-                primaryKey: true,
-                autoIncrement: true
-            },
-
-            recipeId: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                field: "recipe_id"
-            },
-
-            ingredient: {
-                type: DataTypes.TEXT,
-                allowNull: false,
-
-                validate: {
-                    notEmpty: {
-                        msg: "Ingredient cannot be empty."
-                    }
+        ingredient: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                notEmpty: {
+                    msg: "Ingredient cannot be empty."
                 }
             }
-        },
-        {
-            tableName: "ingredients",
-            timestamps: false
         }
-    );
+    },
+    {
+        tableName: "ingredients",
+        timestamps: false
+    }
+);
 
-
-    return Ingredient;
-};
+module.exports = Ingredient;

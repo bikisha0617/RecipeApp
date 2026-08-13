@@ -1,63 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Login</title>
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/login.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/login.css"
+    >
 </head>
+
 <body>
 
-<div class="login-container">
-    <div class="login-box">
-        <h1>Login</h1>
+    <div class="login-container">
 
-        <p class="subtitle">
-            Login to your account to continue
-        </p>
+        <div class="login-box">
 
-        <form id="loginForm">
-            <label>Email</label>
-            <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
-            >
-            <label>Password</label>
-            <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-            >
-            <button type="submit" class="login-btn">
-                Login
-            </button>
-        </form>
+            <h1>Login</h1>
 
-        <div class="divider">
-            <span>OR</span>
+            <p class="subtitle">
+                Login to your account to continue
+            </p>
+
+
+            <!-- LOGIN FORM -->
+
+            <form id="loginForm">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required
+                >
+
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="login-btn"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- DIVIDER -->
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+
+            <!-- SOCIAL BUTTONS -->
+
+            <div class="social-buttons">
+
+                <button
+                    type="button"
+                    class="social-btn google"
+                    aria-label="Login with Google"
+                >
+
+                    <img
+                        src="images/icons/google.png"
+                        alt="Google"
+                    >
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="social-btn apple"
+                    aria-label="Login with Apple"
+                >
+
+                    <img
+                        src="images/icons/apple.png"
+                        alt="Apple"
+                    >
+
+                </button>
+
+            </div>
+
+
+            <!-- SIGNUP LINK -->
+
+            <p class="signup">
+
+                Don't have an account?
+
+                <a href="signup.html">
+                    Sign Up
+                </a>
+
+            </p>
+
         </div>
-        
-        <div class="social-buttons">
-        <button class="social-btn google">
-            <img src="images/icons/google.png">
-        </button>
 
-        <button class="social-btn apple">
-            <img src="images/icons/apple.png">
-        </button>
-        </div>
-
-        <p class="signup">
-            Don't have an account?
-            <a href="signup.html">Sign Up</a>
-        </p>
     </div>
-</div>
 
-<script src="js/login.js"></script>
+
+    <!-- JAVASCRIPT -->
+
+    <script src="js/api.js"></script>
+
+    <script src="js/login.js"></script>
 
 </body>
+
 </html>

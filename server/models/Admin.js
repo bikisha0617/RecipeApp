@@ -1,17 +1,17 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../database");
+const { sequelize } = require("../database");
 
 const Admin = sequelize.define(
     "Admin",
     {
         id: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
+            primaryKey: true
         },
 
         username: {
-            type: DataTypes.STRING(50),
+            type: DataTypes.STRING(100),
             allowNull: false,
             unique: true,
             validate: {
@@ -19,22 +19,35 @@ const Admin = sequelize.define(
                     msg: "Username is required."
                 },
                 len: {
-                    args: [3, 50],
-                    msg: "Username must be between 3 and 50 characters."
+                    args: [3, 100],
+                    msg: "Username must be between 3 and 100 characters."
                 }
             }
         },
 
         password: {
-            type: DataTypes.STRING(255),
+            type: DataTypes.STRING,
             allowNull: false
+        },
+
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            field: "created_at",
+            defaultValue: DataTypes.NOW
+        },
+
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            field: "updated_at",
+            defaultValue: DataTypes.NOW
         }
     },
     {
         tableName: "admins",
-        timestamps: true,
-        createdAt: "created_at",
-        updatedAt: "updated_at"
+
+        timestamps: false
     }
 );
 

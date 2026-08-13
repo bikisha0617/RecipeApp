@@ -1,13 +1,41 @@
-const db = require("./database");
+const bcrypt = require("bcryptjs");
+
+const {
+    sequelize
+} = require("./database");
+
+const {
+    User,
+    Admin,
+    Recipe,
+    Ingredient,
+    Instruction
+} = require("./models");
+
+
+/*
+====================================================
+DEFAULT RECIPES
+====================================================
+*/
+
 const recipes = [
+
     {
         title: "Avocado Toast with Egg",
-        author: "Aarav Sharma",
+
+        description:
+            "A healthy and filling breakfast with creamy avocado, crispy toast, and a perfectly cooked egg.",
+
         time: "10 mins",
-        image: "images/recipes/AvocadoBread.jpg",
-        description: "A healthy and filling breakfast with creamy avocado, crispy toast, and a perfectly cooked egg.",
+
+        image:
+            "images/recipes/AvocadoBread.jpg",
+
         servings: "2",
+
         difficulty: "Easy",
+
         ingredients: [
             "2 slices bread",
             "1 ripe avocado",
@@ -16,6 +44,7 @@ const recipes = [
             "Black pepper",
             "Chilli flakes"
         ],
+
         instructions: [
             "Toast the bread until golden brown.",
             "Mash the avocado with salt and pepper.",
@@ -24,14 +53,23 @@ const recipes = [
             "Top with eggs and chilli flakes."
         ]
     },
+
+
     {
         title: "White Sauce Pasta",
-        author: "Sophia Rossi",
+
+        description:
+            "A creamy pasta with vegetables in a rich white sauce.",
+
         time: "30 mins",
-        image: "images/recipes/pasta.jpg",
-        description: "A creamy pasta with vegetables in a rich white sauce.",
+
+        image:
+            "images/recipes/pasta.jpg",
+
         servings: "2",
+
         difficulty: "Medium",
+
         ingredients: [
             "200 g pasta",
             "2 tbsp butter",
@@ -43,6 +81,7 @@ const recipes = [
             "Black pepper",
             "Chilli flakes"
         ],
+
         instructions: [
             "Cook pasta according to package instructions.",
             "Melt butter in a pan.",
@@ -52,14 +91,23 @@ const recipes = [
             "Serve hot."
         ]
     },
+
+
     {
         title: "Veggie Wrap",
-        author: "Maya Singh",
+
+        description:
+            "A quick and healthy wrap filled with fresh vegetables.",
+
         time: "15 mins",
-        image: "images/recipes/VeggieWrap.jpg",
-        description: "A quick and healthy wrap filled with fresh vegetables.",
+
+        image:
+            "images/recipes/VeggieWrap.jpg",
+
         servings: "2",
+
         difficulty: "Easy",
+
         ingredients: [
             "2 tortillas or chapatis",
             "1 cup shredded lettuce",
@@ -70,6 +118,7 @@ const recipes = [
             "Salt",
             "Black pepper"
         ],
+
         instructions: [
             "Place one tortilla on a flat surface.",
             "Spread hummus or mayonnaise on the tortilla.",
@@ -78,14 +127,23 @@ const recipes = [
             "Fold the tortilla and cut in half."
         ]
     },
+
+
     {
         title: "Chicken Curry",
-        author: "Kabir Khan",
+
+        description:
+            "A rich and flavorful chicken curry made with aromatic spices.",
+
         time: "40 mins",
-        image: "images/recipes/ChickenCurry.jpg",
-        description: "A rich and flavorful chicken curry made with aromatic spices.",
+
+        image:
+            "images/recipes/ChickenCurry.jpg",
+
         servings: "4",
+
         difficulty: "Hard",
+
         ingredients: [
             "500g chicken",
             "2 onions",
@@ -96,6 +154,7 @@ const recipes = [
             "Salt",
             "Oil"
         ],
+
         instructions: [
             "Heat oil in a pan.",
             "Cook onions until golden.",
@@ -106,14 +165,23 @@ const recipes = [
             "Serve hot with rice."
         ]
     },
+
+
     {
         title: "Banana Pancakes",
-        author: "Emma Collins",
+
+        description:
+            "Soft, naturally sweet pancakes perfect for breakfast.",
+
         time: "20 mins",
-        image: "images/recipes/BananaPancakes.jpg",
-        description: "Soft, naturally sweet pancakes perfect for breakfast.",
+
+        image:
+            "images/recipes/BananaPancakes.jpg",
+
         servings: "2",
+
         difficulty: "Easy",
+
         ingredients: [
             "2 ripe bananas",
             "½ cup flour",
@@ -126,6 +194,7 @@ const recipes = [
             "Butter or oil",
             "Maple syrup or honey for serving"
         ],
+
         instructions: [
             "Mash the bananas in a bowl.",
             "In a separate bowl, mix the flour, baking powder, and sugar.",
@@ -137,14 +206,23 @@ const recipes = [
             "Serve with maple syrup or honey."
         ]
     },
+
+
     {
         title: "Vegetable Fried Rice",
-        author: "Ethan Wong",
+
+        description:
+            "Flavorful rice stir-fried with colorful vegetables.",
+
         time: "20 mins",
-        image: "images/recipes/FriedRice.jpg",
-        description: "Flavorful rice stir-fried with colorful vegetables.",
+
+        image:
+            "images/recipes/FriedRice.jpg",
+
         servings: "2",
+
         difficulty: "Medium",
+
         ingredients: [
             "2 cups cooked rice",
             "1 cup mixed vegetables",
@@ -156,6 +234,7 @@ const recipes = [
             "1 tsp sesame oil",
             "Spring onions for garnish"
         ],
+
         instructions: [
             "Heat oil and sauté garlic.",
             "Add mixed vegetables and cook until tender.",
@@ -164,14 +243,23 @@ const recipes = [
             "Garnish with spring onions and drizzle with sesame oil."
         ]
     },
+
+
     {
         title: "Fresh Fruit Salad",
-        author: "Sofia Martinez",
+
+        description:
+            "A refreshing mix of seasonal fruits, perfect for a healthy snack.",
+
         time: "10 mins",
-        image: "images/recipes/FruitSalad.jpg",
-        description: "A refreshing mix of seasonal fruits, perfect for a healthy snack.",
+
+        image:
+            "images/recipes/FruitSalad.jpg",
+
         servings: "2",
+
         difficulty: "Easy",
+
         ingredients: [
             "1 cup apples, diced",
             "1 cup grapes, halved",
@@ -179,6 +267,7 @@ const recipes = [
             "1 tbsp honey",
             "1 tbsp lemon juice"
         ],
+
         instructions: [
             "Dice the apples and halve the grapes and strawberries.",
             "In a large bowl, combine all the fruits.",
@@ -187,14 +276,23 @@ const recipes = [
             "Chill for at least 30 minutes before serving."
         ]
     },
+
+
     {
         title: "Stir-Fry Noodles",
-        author: "Chen Wei",
+
+        description:
+            "A delicious and easy-to-make stir-fry with tender noodles and colorful vegetables.",
+
         time: "25 mins",
-        image: "images/recipes/Noodles.jpg",
-        description: "A delicious and easy-to-make stir-fry with tender noodles and colorful vegetables.",
+
+        image:
+            "images/recipes/Noodles.jpg",
+
         servings: "2",
+
         difficulty: "Medium",
+
         ingredients: [
             "200g stir-fry noodles",
             "1 cup mixed vegetables",
@@ -206,6 +304,7 @@ const recipes = [
             "Black pepper",
             "Chilli flakes"
         ],
+
         instructions: [
             "Heat oil and sauté garlic.",
             "Add mixed vegetables and cook until tender.",
@@ -214,14 +313,23 @@ const recipes = [
             "Garnish with chilli flakes."
         ]
     },
+
+
     {
         title: "Chocolate Mug Cake",
-        author: "Olivia Brown",
+
+        description:
+            "A quick and easy dessert that can be made in a microwave.",
+
         time: "5 mins",
-        image: "images/recipes/MugCake.jpg",
-        description: "A quick and easy dessert that can be made in a microwave.",
+
+        image:
+            "images/recipes/MugCake.jpg",
+
         servings: "2",
+
         difficulty: "Easy",
+
         ingredients: [
             "4 tbsp flour",
             "2 tbsp cocoa powder",
@@ -231,6 +339,7 @@ const recipes = [
             "2 tbsp oil",
             "¼ tsp vanilla extract"
         ],
+
         instructions: [
             "Mix dry ingredients in a mug.",
             "Add milk, oil, and vanilla extract.",
@@ -238,14 +347,23 @@ const recipes = [
             "Let cool for a few minutes before serving."
         ]
     },
+
+
     {
         title: "Paneer Butter Masala",
-        author: "Ananya Gupta",
+
+        description:
+            "Creamy tomato-based curry with soft paneer cubes.",
+
         time: "35 mins",
-        image: "images/recipes/PaneerCurry.jpg",
-        description: "Creamy tomato-based curry with soft paneer cubes.",
+
+        image:
+            "images/recipes/PaneerCurry.jpg",
+
         servings: "2",
+
         difficulty: "Hard",
+
         ingredients: [
             "200g paneer, cubed",
             "1 cup tomatoes, chopped",
@@ -257,6 +375,7 @@ const recipes = [
             "Salt",
             "Black pepper"
         ],
+
         instructions: [
             "Heat butter and sauté ginger-garlic paste.",
             "Add chopped tomatoes and cook until they soften.",
@@ -265,14 +384,23 @@ const recipes = [
             "Simmer for 10-15 minutes until the curry thickens."
         ]
     },
+
+
     {
         title: "Grilled Chicken Salad",
-        author: "Noah Bennett",
+
+        description:
+            "A protein-rich salad with grilled chicken and fresh vegetables.",
+
         time: "25 mins",
-        image: "images/recipes/Salad.jpg",
-        description: "A protein-rich salad with grilled chicken and fresh vegetables.",
+
+        image:
+            "images/recipes/Salad.jpg",
+
         servings: "2",
+
         difficulty: "Medium",
+
         ingredients: [
             "2 chicken breasts",
             "4 cups mixed salad greens",
@@ -283,6 +411,7 @@ const recipes = [
             "Salt",
             "Black pepper"
         ],
+
         instructions: [
             "Season and grill chicken until fully cooked.",
             "Combine salad greens, tomatoes, cucumber, olive oil, and lemon juice in a large bowl.",
@@ -290,14 +419,23 @@ const recipes = [
             "Season with salt and black pepper to taste."
         ]
     },
+
+
     {
         title: "Vegetable Omelette",
-        author: "Riya Patel",
+
+        description:
+            "A fluffy omelette filled with fresh vegetables.",
+
         time: "25 mins",
-        image: "images/recipes/Omlette.jpg",
-        description: "A fluffy omelette filled with fresh vegetables.",
+
+        image:
+            "images/recipes/Omlette.jpg",
+
         servings: "1",
+
         difficulty: "Easy",
+
         ingredients: [
             "2 eggs",
             "¼ cup chopped onion",
@@ -307,6 +445,7 @@ const recipes = [
             "Salt",
             "Black pepper"
         ],
+
         instructions: [
             "Beat eggs with salt and pepper.",
             "Heat oil or butter in a pan.",
@@ -314,71 +453,301 @@ const recipes = [
             "Fold the omelette in half and serve."
         ]
     }
+
 ];
 
-// Create a temporary user for default recipes
-db.run(
-    `
-    INSERT OR IGNORE INTO users
-    (id, name, email, password)
-    VALUES (1, 'Recipe App', 'default@recipeapp.com', '')
-    `,
-    function (err) {
-        if (err) {
-            console.error("Could not create default user:", err.message);
-            return;
-        }
-        recipes.forEach((recipe, index) => {
-            const recipeId = index + 1;
-            db.run(
-                `
-                INSERT OR IGNORE INTO recipes
-                (
-                    id,
-                    user_id,
-                    title,
-                    description,
-                    category,
-                    time,
-                    servings,
-                    difficulty,
-                    image
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                `,
-                [
-                    recipeId,
-                    1,
-                    recipe.title,
-                    recipe.description,
-                    "",
-                    recipe.time,
-                    recipe.servings,
-                    recipe.difficulty,
-                    recipe.image
-                ]
-            );
-            recipe.ingredients.forEach(ingredient => {
-                db.run(
-                    `
-                    INSERT OR IGNORE INTO ingredients
-                    (recipe_id, ingredient)
-                    VALUES (?, ?)
-                    `,
-                    [recipeId, ingredient]
-                );
-            });
-            recipe.instructions.forEach(instruction => {
-                db.run(
-                    `
-                    INSERT OR IGNORE INTO instructions
-                    (recipe_id, instruction)
-                    VALUES (?, ?)
-                    `,
-                    [recipeId, instruction]
-                );
-            });
+
+/*
+====================================================
+SEED DATABASE
+====================================================
+*/
+
+async function seedDatabase() {
+
+    try {
+
+        /*
+        --------------------------------------------
+        Connect
+        --------------------------------------------
+        */
+
+        await sequelize.authenticate();
+
+        console.log(
+            "Database connected."
+        );
+
+
+        /*
+        --------------------------------------------
+        Sync models
+        --------------------------------------------
+        */
+
+        await sequelize.sync();
+
+        console.log(
+            "Database models synchronized."
+        );
+
+
+        /*
+        --------------------------------------------
+        CREATE DEFAULT USER
+        --------------------------------------------
+        */
+
+        const [
+            defaultUser
+        ] = await User.findOrCreate({
+
+            where: {
+                email:
+                    "default@recipeapp.com"
+            },
+
+            defaults: {
+
+                name:
+                    "Recipe App",
+
+                email:
+                    "default@recipeapp.com",
+
+                password:
+                    await bcrypt.hash(
+                        "default-recipe-user",
+                        12
+                    )
+
+            }
+
         });
-        console.log("Default recipes added.");
+
+
+        console.log(
+            `Default user ID: ${defaultUser.id}`
+        );
+
+
+        /*
+        --------------------------------------------
+        CREATE ADMIN
+        --------------------------------------------
+        */
+
+        const adminPassword =
+            process.env.ADMIN_PASSWORD ||
+            "Admin@12345";
+
+
+        const hashedAdminPassword =
+            await bcrypt.hash(
+                adminPassword,
+                12
+            );
+
+
+        const [
+            admin,
+            adminCreated
+        ] = await Admin.findOrCreate({
+
+            where: {
+                username:
+                    "admin"
+            },
+
+            defaults: {
+
+                username:
+                    "admin",
+
+                password:
+                    hashedAdminPassword
+
+            }
+
+        });
+
+
+        if (adminCreated) {
+
+            console.log(
+                "Admin account created."
+            );
+
+            console.log(
+                "Username: admin"
+            );
+
+            console.log(
+                "Password: " +
+                adminPassword
+            );
+
+        } else {
+
+            console.log(
+                "Admin account already exists."
+            );
+
+        }
+
+
+        /*
+        --------------------------------------------
+        CREATE DEFAULT RECIPES
+        --------------------------------------------
+        */
+
+        for (
+            const recipeData of recipes
+        ) {
+
+            const existingRecipe =
+                await Recipe.findOne({
+
+                    where: {
+                        title:
+                            recipeData.title
+                    }
+
+                });
+
+
+            if (existingRecipe) {
+
+                console.log(
+                    `Recipe already exists: ${recipeData.title}`
+                );
+
+                continue;
+            }
+
+
+            /*
+            Create recipe
+            */
+
+            const recipe =
+                await Recipe.create({
+
+                    userId:
+                        defaultUser.id,
+
+                    title:
+                        recipeData.title,
+
+                    description:
+                        recipeData.description,
+
+                    category:
+                        "",
+
+                    time:
+                        recipeData.time,
+
+                    servings:
+                        recipeData.servings,
+
+                    difficulty:
+                        recipeData.difficulty,
+
+                    image:
+                        recipeData.image,
+
+                    calories:
+                        0,
+
+                    protein:
+                        0,
+
+                    carbs:
+                        0,
+
+                    fat:
+                        0
+
+                });
+
+
+            /*
+            Create ingredients
+            */
+
+            for (
+                const ingredient
+                of recipeData.ingredients
+            ) {
+
+                await Ingredient.create({
+
+                    recipeId:
+                        recipe.id,
+
+                    ingredient:
+                        ingredient
+
+                });
+
+            }
+
+
+            /*
+            Create instructions
+            */
+
+            for (
+                const instruction
+                of recipeData.instructions
+            ) {
+
+                await Instruction.create({
+
+                    recipeId:
+                        recipe.id,
+
+                    instruction:
+                        instruction
+
+                });
+
+            }
+
+
+            console.log(
+                `Added recipe: ${recipeData.title}`
+            );
+
+        }
+
+
+        console.log(
+            "Database seeding completed."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Seeding error:",
+            error
+        );
+
+    } finally {
+
+        await sequelize.close();
+
+        console.log(
+            "Database connection closed."
+        );
+
     }
-);
+
+}
+
+
+seedDatabase();

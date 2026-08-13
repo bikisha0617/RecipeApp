@@ -1,39 +1,28 @@
-require("dotenv").config();
-
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+require("dotenv").config();
 
-const {
-    sequelize
-} = require("./models");
+const { sequelize, connectDatabase } = require("./database");
 
+// Import models so Sequelize knows about them
+require("./models");
 
-const authRoutes =
-    require("./routes/auth");
+// Routes
+const authRoutes = require("./routes/auth");
+const recipeRoutes = require("./routes/recipes");
+const favouriteRoutes = require("./routes/favourites");
+const userRoutes = require("./routes/users");
 
-const recipeRoutes =
-    require("./routes/recipes");
+const app = express();
 
-const favouriteRoutes =
-    require("./routes/favourites");
-
-const userRoutes =
-    require("./routes/users");
-
-
-const app =
-    express();
-
-
-const PORT =
-    process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 
 /*
-=====================================================
+====================================================
 MIDDLEWARE
-=====================================================
+====================================================
 */
 
 app.use(
@@ -43,98 +32,79 @@ app.use(
     })
 );
 
+app.use(express.json());
 
-app.use(
-    express.json()
-);
-
-
-app.use(
-    express.urlencoded({
-        extended: true
-    })
-);
+app.use(express.urlencoded({
+    extended: true
+}));
 
 
 /*
-=====================================================
-STATIC UPLOADS
-=====================================================
+====================================================
+SERVE UPLOADED IMAGES
+====================================================
 */
 
 app.use(
     "/uploads",
     express.static(
-        path.join(
-            __dirname,
-            "uploads"
-        )
+        path.join(__dirname, "uploads")
     )
 );
 
 
 /*
-=====================================================
-HOME
-=====================================================
+====================================================
+TEST ROUTE
+====================================================
 */
 
-app.get(
-    "/",
-    function (req, res) {
+app.get("/", function (req, res) {
+
+    res.json({
+        message: "Recipe App backend is running!"
+    });
+
+});
+
+
+/*
+====================================================
+DATABASE TEST
+====================================================
+*/
+
+app.get("/api/test-db", async function (req, res) {
+
+    try {
+
+        await sequelize.authenticate();
 
         res.json({
-            message:
-                "Recipe App backend is running!"
+            message: "SQLite is working with Sequelize!",
+            database: "Connected"
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Database test error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Database connection failed."
         });
 
     }
-);
+
+});
 
 
 /*
-=====================================================
-DATABASE TEST
-=====================================================
-*/
-
-app.get(
-    "/api/test-db",
-    async function (req, res) {
-
-        try {
-
-            await sequelize.authenticate();
-
-
-            res.json({
-                message:
-                    "SQLite + Sequelize is working!"
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Database test error:",
-                error
-            );
-
-
-            res.status(500).json({
-                message:
-                    "Database connection failed."
-            });
-
-        }
-
-    }
-);
-
-
-/*
-=====================================================
+====================================================
 API ROUTES
-=====================================================
+====================================================
 */
 
 app.use(
@@ -142,18 +112,15 @@ app.use(
     authRoutes
 );
 
-
 app.use(
     "/api/recipes",
     recipeRoutes
 );
 
-
 app.use(
     "/api/favourites",
     favouriteRoutes
 );
-
 
 app.use(
     "/api/users",
@@ -162,77 +129,91 @@ app.use(
 
 
 /*
-=====================================================
-404
-=====================================================
+====================================================
+404 HANDLER
+====================================================
 */
 
-app.use(
-    function (req, res) {
+app.use(function (req, res) {
 
-        res.status(404).json({
-            message:
-                "API route not found."
-        });
+    res.status(404).json({
+        message: "API route not found."
+    });
 
-    }
-);
+});
 
 
 /*
-=====================================================
-ERROR HANDLER
-=====================================================
+====================================================
+GENERAL ERROR HANDLER
+====================================================
 */
 
-app.use(
-    function (
-        error,
-        req,
-        res,
-        next
-    ) {
+app.use(function (error, req, res, next) {
 
-        console.error(
-            "Server error:",
-            error
-        );
+    console.error(
+        "Server error:",
+        error
+    );
 
+    res.status(
+        error.status || 500
+    ).json({
+        message:
+            error.message ||
+            "Internal server error."
+    });
 
-        res.status(500).json({
-            message:
-                "Internal server error."
-        });
-
-    }
-);
+});
 
 
 /*
-=====================================================
+====================================================
 START SERVER
-=====================================================
+====================================================
 */
 
 async function startServer() {
 
     try {
 
-        await sequelize.authenticate();
+        /*
+        --------------------------------------------
+        Connect to SQLite
+        --------------------------------------------
+        */
+
+        const connected =
+            await connectDatabase();
+
+        if (!connected) {
+
+            console.error(
+                "Server could not connect to database."
+            );
+
+            process.exit(1);
+        }
 
 
-        console.log(
-            "Connected to SQLite database through Sequelize."
-        );
-
+        /*
+        --------------------------------------------
+        Synchronize Sequelize models
+        --------------------------------------------
+        */
 
         await sequelize.sync();
 
-
         console.log(
-            "Database models synchronized."
+            "Sequelize models synchronized."
         );
 
+
+        /*
+        --------------------------------------------
+        Start Express
+        --------------------------------------------
+        */
 
         app.listen(
             PORT,
@@ -242,7 +223,6 @@ async function startServer() {
                     `Server running at http://localhost:${PORT}`
                 );
 
-
                 console.log(
                     `Uploaded images available at http://localhost:${PORT}/uploads/`
                 );
@@ -250,14 +230,14 @@ async function startServer() {
             }
         );
 
-
     } catch (error) {
 
         console.error(
-            "Unable to start server:",
+            "Could not start server:",
             error
         );
 
+        process.exit(1);
     }
 
 }
