@@ -1,25 +1,17 @@
 const API_BASE_URL = "http://localhost:3000/api";
 
-/* =====================================================
-   AUTH STORAGE
-===================================================== */
-
 function getToken() {
     return localStorage.getItem("token");
 }
-
 function getAuthToken() {
     return localStorage.getItem("token");
 }
-
 function getCurrentUser() {
     try {
         const user = localStorage.getItem("user");
-
         if (!user) {
             return null;
         }
-
         return JSON.parse(user);
     } catch (error) {
         console.error("Could not read saved user:", error);
@@ -29,24 +21,19 @@ function getCurrentUser() {
 
 function getUserId() {
     const user = getCurrentUser();
-
     if (user && user.id) {
         return Number(user.id);
     }
-
     const savedId = localStorage.getItem("userId");
-
     if (savedId) {
         return Number(savedId);
     }
-
     return null;
 }
 
 function getUserRole() {
     return localStorage.getItem("role") || "";
 }
-
 function isLoggedIn() {
     return Boolean(
         localStorage.getItem("token") &&
@@ -54,69 +41,30 @@ function isLoggedIn() {
     );
 }
 
-
-/* =====================================================
-   SAVE LOGIN
-===================================================== */
-
+/* Save login */
 function saveAuth(token, user, role) {
-
     if (!token) {
         return;
     }
-
-    localStorage.setItem(
-        "token",
-        token
-    );
-
-    localStorage.setItem(
-        "loggedIn",
-        "true"
-    );
-
-    localStorage.setItem(
-        "role",
-        role || "user"
-    );
-
+    localStorage.setItem("token",token);
+    localStorage.setItem("loggedIn","true");
+    localStorage.setItem("role",role || "user");
     if (user) {
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify(user)
-        );
-
+        localStorage.setItem("user",JSON.stringify(user));
         if (user.id !== undefined) {
-            localStorage.setItem(
-                "userId",
-                String(user.id)
-            );
+            localStorage.setItem("userId",String(user.id));
         }
-
         if (user.name !== undefined) {
-            localStorage.setItem(
-                "userName",
-                user.name
-            );
+            localStorage.setItem("userName",user.name);
         }
-
         if (user.email !== undefined) {
-            localStorage.setItem(
-                "userEmail",
-                user.email
-            );
+            localStorage.setItem("userEmail",user.email);
         }
     }
 }
 
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
+/* Logout */
 function logout() {
-
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("role");
@@ -125,271 +73,117 @@ function logout() {
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userType");
-
     window.location.href = "login.html";
 }
 
-
-/* =====================================================
-   AUTH HEADERS
-===================================================== */
-
 function getAuthHeaders(includeJson) {
-
     const headers = {};
-
     if (includeJson !== false) {
-        headers["Content-Type"] =
-            "application/json";
+        headers["Content-Type"] ="application/json";
     }
-
     const token = getAuthToken();
-
     if (token) {
-        headers["Authorization"] =
-            "Bearer " + token;
+        headers["Authorization"] ="Bearer " + token;
     }
-
     return headers;
 }
 
-
-/* =====================================================
-   MAIN API REQUEST
-===================================================== */
-
 async function apiRequest(endpoint, options) {
-
     options = options || {};
-
-    const url =
-        API_BASE_URL + endpoint;
-
-    const isFormData =
-        options.body instanceof FormData;
-
+    const url =API_BASE_URL + endpoint;
+    const isFormData =options.body instanceof FormData;
     const headers = {
         ...getAuthHeaders(!isFormData),
         ...(options.headers || {})
     };
-
-    /*
-       Do not manually set Content-Type for FormData.
-       The browser adds the multipart boundary.
-    */
-
     if (isFormData) {
         delete headers["Content-Type"];
     }
-
     const config = {
         ...options,
         headers: headers
     };
-
     try {
-
-        const response =
-            await fetch(
-                url,
-                config
-            );
-
-        const contentType =
-            response.headers.get(
-                "content-type"
-            ) || "";
-
+        const response =await fetch(url,config);
+        const contentType =response.headers.get("content-type") || "";
         let data;
-
-        if (
-            contentType.includes(
-                "application/json"
-            )
-        ) {
-
-            data =
-                await response.json();
-
+        if (contentType.includes("application/json")) {
+            data =await response.json();
         } else {
-
-            data =
-                await response.text();
+            data =await response.text();
         }
-
-
-        /*
-           Authentication expired.
-        */
-
         if (response.status === 401) {
-
-            localStorage.removeItem(
-                "token"
-            );
-
-            localStorage.removeItem(
-                "loggedIn"
-            );
-
-            localStorage.removeItem(
-                "user"
-            );
-
-            localStorage.removeItem(
-                "role"
-            );
-
-            localStorage.removeItem(
-                "userId"
-            );
-
-            localStorage.removeItem(
-                "userName"
-            );
-
-            localStorage.removeItem(
-                "userEmail"
-            );
-
-            localStorage.removeItem(
-                "userType"
-            );
+            localStorage.removeItem("token");
+            localStorage.removeItem("loggedIn");
+            localStorage.removeItem("user");
+            localStorage.removeItem("role");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userName");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userType");
         }
-
-
         if (!response.ok) {
-
-            let message =
-                "Request failed.";
-
-            if (
-                data &&
-                typeof data === "object" &&
-                data.message
-            ) {
+            let message ="Request failed.";
+            if (data && typeof data === "object" && data.message) {
                 message = data.message;
             }
-
-            if (
-                typeof data === "string" &&
-                data.trim()
-            ) {
+            if (typeof data === "string" && data.trim()) {
                 message = data;
             }
-
-            const error =
-                new Error(message);
-
-            error.status =
-                response.status;
-
-            error.data =
-                data;
-
+            const error =new Error(message);
+            error.status =response.status;
+            error.data =data;
             throw error;
         }
-
-
         return data;
-
     } catch (error) {
-
-        console.error(
-            "API request error:",
-            error
-        );
-
+        console.error("API request error:",error);
         throw error;
     }
 }
 
-
-/* =====================================================
-   RECIPES
-===================================================== */
-
+/* Recipes */
 async function getRecipes() {
-
-    return await apiRequest(
-        "/recipes",
+    return await apiRequest("/recipes",
         {
             method: "GET"
         }
     );
 }
-
-
 async function getAllRecipes() {
-
     return await getRecipes();
 }
-
-
 async function getRecipe(id) {
-
-    const recipeId =
-        Number(id);
-
-    if (
-        !Number.isInteger(recipeId) ||
-        recipeId <= 0
-    ) {
-        throw new Error(
-            "Invalid recipe ID."
-        );
+    const recipeId =Number(id);
+    if (!Number.isInteger(recipeId) || recipeId <= 0) {
+        throw new Error("Invalid recipe ID.");
     }
-
-    return await apiRequest(
-        "/recipes/" + recipeId,
+    return await apiRequest("/recipes/" + recipeId,
         {
             method: "GET"
         }
     );
 }
-
 
 async function getMyRecipes(userId) {
-
-    const id =
-        Number(
-            userId || getUserId()
-        );
-
-    if (
-        !Number.isInteger(id) ||
-        id <= 0
-    ) {
-        throw new Error(
-            "Invalid user ID."
-        );
+    const id =Number(userId || getUserId());
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("Invalid user ID.");
     }
-
-    return await apiRequest(
-        "/recipes/user/" + id,
+    return await apiRequest("/recipes/user/" + id,
         {
             method: "GET"
         }
     );
 }
 
-
 async function getUserRecipes(userId) {
-
-    return await getMyRecipes(
-        userId
-    );
+    return await getMyRecipes(userId);
 }
 
-
-/* =====================================================
-   CREATE RECIPE
-===================================================== */
-
+/* Create Recipe */
 async function createRecipe(formData) {
-
-    return await apiRequest(
-        "/recipes",
+    return await apiRequest("/recipes",
         {
             method: "POST",
             body: formData
@@ -397,21 +191,10 @@ async function createRecipe(formData) {
     );
 }
 
-
-/* =====================================================
-   UPDATE RECIPE
-===================================================== */
-
-async function updateRecipe(
-    id,
-    formData
-) {
-
-    const recipeId =
-        Number(id);
-
-    return await apiRequest(
-        "/recipes/" + recipeId,
+/* Update Recipe */
+async function updateRecipe(id,formData) {
+    const recipeId =Number(id);
+    return await apiRequest("/recipes/" + recipeId,
         {
             method: "PUT",
             body: formData
@@ -419,138 +202,74 @@ async function updateRecipe(
     );
 }
 
-
-/* =====================================================
-   DELETE RECIPE
-===================================================== */
-
+/* Delete Recipe */
 async function deleteRecipe(id) {
-
-    const recipeId =
-        Number(id);
-
-    return await apiRequest(
-        "/recipes/" + recipeId,
+    const recipeId =Number(id);
+    return await apiRequest("/recipes/" + recipeId,
         {
             method: "DELETE"
         }
     );
 }
 
-
 async function deleteRecipeFromAPI(id) {
-
     return await deleteRecipe(id);
 }
 
-
-/* =====================================================
-   FAVOURITES
-===================================================== */
-
+/* Favourites */
 async function getFavourites() {
-
-    return await apiRequest(
-        "/favourites",
+    return await apiRequest("/favourites",
         {
             method: "GET"
         }
     );
 }
 
-
 async function addFavourite(recipeId) {
-
-    const id =
-        Number(recipeId);
-
-    if (
-        !Number.isInteger(id) ||
-        id <= 0
-    ) {
-        throw new Error(
-            "Invalid recipe ID."
-        );
+    const id =Number(recipeId);
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("Invalid recipe ID.");
     }
-
-    return await apiRequest(
-        "/favourites",
+    return await apiRequest("/favourites",
         {
             method: "POST",
-
             body: JSON.stringify({
                 recipe_id: id
             })
         }
     );
 }
-
-
 async function removeFavourite(recipeId) {
-
-    const id =
-        Number(recipeId);
-
-    if (
-        !Number.isInteger(id) ||
-        id <= 0
-    ) {
-        throw new Error(
-            "Invalid recipe ID."
-        );
+    const id =Number(recipeId);
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("Invalid recipe ID.");
     }
-
-    return await apiRequest(
-        "/favourites/" + id,
+    return await apiRequest("/favourites/" + id,
         {
             method: "DELETE"
         }
     );
 }
 
-
-/* =====================================================
-   USER PROFILE
-===================================================== */
-
+/* User profile */
 async function getMyProfile() {
-
-    return await apiRequest(
-        "/users/me",
+    return await apiRequest("/users/me",
         {
             method: "GET"
         }
     );
 }
 
-
 async function getCurrentUser() {
-
     return await getMyProfile();
 }
 
-
-async function updateProfile(
-    userId,
-    data
-) {
-
-    const id =
-        Number(
-            userId || getUserId()
-        );
-
-    if (
-        !Number.isInteger(id) ||
-        id <= 0
-    ) {
-        throw new Error(
-            "Invalid user ID."
-        );
+async function updateProfile(userId,data) {
+    const id =Number(userId || getUserId());
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("Invalid user ID.");
     }
-
-    return await apiRequest(
-        "/users/" + id,
+    return await apiRequest("/users/" + id,
         {
             method: "PUT",
             body: JSON.stringify(data)
@@ -558,29 +277,13 @@ async function updateProfile(
     );
 }
 
-
-/* =====================================================
-   DELETE ACCOUNT
-===================================================== */
-
+/* Delete Account */
 async function deleteAccount(userId) {
-
-    const id =
-        Number(
-            userId || getUserId()
-        );
-
-    if (
-        !Number.isInteger(id) ||
-        id <= 0
-    ) {
-        throw new Error(
-            "Invalid user ID."
-        );
+    const id =Number(userId || getUserId());
+    if (!Number.isInteger(id) ||id <= 0) {
+        throw new Error("Invalid user ID.");
     }
-
-    return await apiRequest(
-        "/users/" + id,
+    return await apiRequest("/users/" + id,
         {
             method: "DELETE"
         }

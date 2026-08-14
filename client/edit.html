@@ -1,24 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport"content="width=device-width, initial-scale=1.0">
     <title>Edit Recipe</title>
-
-    <link
-        rel="stylesheet"
-        href="css/home.css"
-    >
-
+    <link rel="stylesheet" href="css/home.css">
     <style>
-
         .edit-container {
             max-width: 850px;
             margin: 40px auto;
@@ -46,9 +33,7 @@
             margin-bottom: 8px;
         }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        .form-group input,.form-group textarea,.form-group select {
             width: 100%;
             box-sizing: border-box;
             padding: 12px;
@@ -96,8 +81,7 @@
             margin-top: 25px;
         }
 
-        .save-btn,
-        .cancel-btn {
+        .save-btn,.cancel-btn {
             border: none;
             padding: 12px 25px;
             border-radius: 8px;
@@ -146,344 +130,96 @@
             margin-top: 10px;
             border-radius: 10px;
         }
-
     </style>
-
 </head>
-
-
 <body>
-
-
 <header class="navbar">
-
     <div class="logo">
-        <img
-            src="images/logo.png"
-            alt="Logo"
-        >
+        <img src="images/logo.png" alt="Logo">
     </div>
-
-
     <nav class="nav-links">
-
-        <a href="index.html">
-            Explore
-        </a>
-
-        <a href="myrecipes.html">
-            My Recipes
-        </a>
-
-        <a href="create.html">
-            Create
-        </a>
-
-        <a href="favourites.html">
-            Favourites
-        </a>
-
+        <a href="index.html">Explore</a>
+        <a href="myrecipes.html">My Recipes</a>
+        <a href="create.html">Create</a>
+        <a href="favourites.html">Favourites</a>
     </nav>
-
-
     <div class="account-section">
-
-        <button
-            id="loginBtn"
-            type="button"
-            onclick="window.location.href='login.html'"
-        >
-            Login
-        </button>
-
+        <button id="loginBtn" type="button" onclick="window.location.href='login.html'">Login</button>
     </div>
-
 </header>
 
-
-
 <main class="edit-container">
-
-    <h1>
-        Edit Recipe
-    </h1>
-
-
-    <div
-        id="message"
-        class="message"
-    ></div>
-
-
-    <div
-        id="loading"
-        class="loading"
-    >
-        Loading recipe...
-    </div>
-
-
-    <form
-        id="editForm"
-        class="edit-form"
-        style="display:none;"
-    >
-
-
+    <h1>Edit Recipe</h1>
+    <div id="message" class="message"></div>
+    <div id="loading" class="loading">Loading recipe...</div>
+    <form id="editForm" class="edit-form" style="display:none;">
         <div class="form-group">
-
-            <label for="title">
-                Recipe Title
-            </label>
-
-            <input
-                type="text"
-                id="title"
-                required
-            >
-
+            <label for="title">Recipe Title</label>
+            <input type="text" id="title" required>
         </div>
 
-
-
         <div class="form-group">
-
-            <label for="description">
-                Description
-            </label>
-
-            <textarea
-                id="description"
-                required
-            ></textarea>
-
+            <label for="description"> Description </label>
+            <textarea id="description" required></textarea>
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="category">
-                Category
-            </label>
-
-            <input
-                type="text"
-                id="category"
-            >
-
+            <label for="category">Category</label>
+            <input type="text" id="category">
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="time">
-                Cooking Time
-            </label>
-
-            <input
-                type="text"
-                id="time"
-                required
-            >
-
+            <label for="time">Cooking Time</label>
+            <input type="text" id="time" required>
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="servings">
-                Servings
-            </label>
-
-            <input
-                type="text"
-                id="servings"
-                required
-            >
-
+            <label for="servings">Servings</label>
+            <input type="text" id="servings" required>
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="difficulty">
-                Difficulty
-            </label>
-
+            <label for="difficulty">Difficulty</label>
             <select id="difficulty">
-
-                <option value="Easy">
-                    Easy
-                </option>
-
-                <option value="Medium">
-                    Medium
-                </option>
-
-                <option value="Hard">
-                    Hard
-                </option>
-
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
             </select>
-
         </div>
-
-
-
         <div class="form-group">
-
-            <label>
-                Current Image
-            </label>
-
-            <img
-                id="currentImage"
-                class="current-image"
-                alt="Current recipe image"
-            >
-
+            <label>Current Image</label>
+            <img id="currentImage" class="current-image" alt="Current recipe image">
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="calories">
-                Calories
-            </label>
-
-            <input
-                type="number"
-                id="calories"
-                min="0"
-            >
-
+            <label for="calories">Calories</label>
+            <input type="number" id="calories" min="0">
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="protein">
-                Protein
-            </label>
-
-            <input
-                type="number"
-                id="protein"
-                min="0"
-            >
-
+            <label for="protein">Protein</label>
+            <input type="number" id="protein" min="0">
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="carbs">
-                Carbohydrates
-            </label>
-
-            <input
-                type="number"
-                id="carbs"
-                min="0"
-            >
-
+            <label for="carbs">Carbohydrates</label>
+            <input type="number" id="carbs" min="0">
         </div>
-
-
-
         <div class="form-group">
-
-            <label for="fat">
-                Fat
-            </label>
-
-            <input
-                type="number"
-                id="fat"
-                min="0"
-            >
-
+            <label for="fat">Fat</label>
+            <input type="number" id="fat" min="0">
         </div>
-
-
-
         <div class="form-group">
-
-            <label>
-                Ingredients
-            </label>
-
+            <label>Ingredients</label>
             <div id="ingredients"></div>
-
-            <button
-                type="button"
-                class="add-item"
-                id="addIngredient"
-            >
-                + Add Ingredient
-            </button>
-
+            <button type="button" class="add-item" id="addIngredient">+ Add Ingredient</button>
         </div>
-
-
-
         <div class="form-group">
-
-            <label>
-                Instructions
-            </label>
-
+            <label>Instructions</label>
             <div id="instructions"></div>
-
-            <button
-                type="button"
-                class="add-item"
-                id="addInstruction"
-            >
-                + Add Instruction
-            </button>
-
+            <button type="button" class="add-item" id="addInstruction">+ Add Instruction</button>
         </div>
-
-
-
         <div class="form-actions">
-
-            <button
-                type="submit"
-                class="save-btn"
-                id="saveBtn"
-            >
-                Save Changes
-            </button>
-
-
-            <button
-                type="button"
-                class="cancel-btn"
-                onclick="window.location.href='myrecipes.html'"
-            >
-                Cancel
-            </button>
-
+            <button type="submit" class="save-btn" id="saveBtn">Save Changes</button>
+            <button type="button" class="cancel-btn" onclick="window.location.href='myrecipes.html'">Cancel</button>
         </div>
-
-
     </form>
-
 </main>
-
 
 <script src="js/api.js"></script>
 <script src="js/edit.js"></script>
-
 </body>
-
 </html>
