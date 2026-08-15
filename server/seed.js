@@ -6,7 +6,7 @@ const recipes = [
     {
         title:"Avocado Toast with Egg",
         description:"A healthy and filling breakfast with creamy avocado, crispy toast, and a perfectly cooked egg.",
-        time:"10 mins",
+        time:"10",
         image:"images/recipes/AvocadoBread.jpg",
         servings:"2",
         difficulty:"Easy",
@@ -29,7 +29,7 @@ const recipes = [
     {
         title:"White Sauce Pasta",
         description:"A creamy pasta with vegetables in a rich white sauce.",
-        time:"30 mins",
+        time:"30",
         image:"images/recipes/pasta.jpg",
         servings:"2",
         difficulty:"Medium",
@@ -56,7 +56,7 @@ const recipes = [
     {
         title:"Veggie Wrap",
         description:"A quick and healthy wrap filled with fresh vegetables.",
-        time:"15 mins",
+        time:"15",
         image:"images/recipes/VeggieWrap.jpg",
         servings:"2",
         difficulty:"Easy",
@@ -81,7 +81,7 @@ const recipes = [
     {
         title:"Chicken Curry",
         description:"A rich and flavorful chicken curry made with aromatic spices.",
-        time:"40 mins",
+        time:"40",
         image:"images/recipes/ChickenCurry.jpg",
         servings:"4",
         difficulty:"Hard",
@@ -108,7 +108,7 @@ const recipes = [
     {
         title:"Banana Pancakes",
         description:"Soft, naturally sweet pancakes perfect for breakfast.",
-        time:"20 mins",
+        time:"20",
         image:"images/recipes/BananaPancakes.jpg",
         servings:"2",
         difficulty:"Easy",
@@ -138,7 +138,7 @@ const recipes = [
     {
         title:"Vegetable Fried Rice",
         description:"Flavorful rice stir-fried with colorful vegetables.",
-        time:"20 mins",
+        time:"20",
         image:"images/recipes/FriedRice.jpg",
         servings:"2",
         difficulty:"Medium",
@@ -164,7 +164,7 @@ const recipes = [
     {
         title:"Fresh Fruit Salad",
         description:"A refreshing mix of seasonal fruits, perfect for a healthy snack.",
-        time:"10 mins",
+        time:"10",
         image:"images/recipes/FruitSalad.jpg",
         servings:"2",
         difficulty:"Easy",
@@ -186,7 +186,7 @@ const recipes = [
     {
         title:"Stir-Fry Noodles",
         description:"A delicious and easy-to-make stir-fry with tender noodles and colorful vegetables.",
-        time:"25 mins",
+        time:"25",
         image:"images/recipes/Noodles.jpg",
         servings:"2",
         difficulty:"Medium",
@@ -212,7 +212,7 @@ const recipes = [
     {
         title:"Chocolate Mug Cake",
         description:"A quick and easy dessert that can be made in a microwave.",
-        time:"5 mins",
+        time:"5",
         image:"images/recipes/MugCake.jpg",
         servings:"2",
         difficulty:"Easy",
@@ -235,7 +235,7 @@ const recipes = [
     {
         title:"Paneer Butter Masala",
         description:"Creamy tomato-based curry with soft paneer cubes.",
-        time:"35 mins",
+        time:"35",
         image:"images/recipes/PaneerCurry.jpg",
         servings:"2",
         difficulty:"Hard",
@@ -261,7 +261,7 @@ const recipes = [
     {
         title:"Grilled Chicken Salad",
         description:"A protein-rich salad with grilled chicken and fresh vegetables.",
-        time:"25 mins",
+        time:"25",
         image:"images/recipes/Salad.jpg",
         servings:"2",
         difficulty:"Medium",
@@ -285,7 +285,7 @@ const recipes = [
     {
         title:"Vegetable Omelette",
         description:"A fluffy omelette filled with fresh vegetables.",
-        time:"25 mins",
+        time:"25",
         image:"images/recipes/Omlette.jpg",
         servings:"1",
         difficulty:"Easy",

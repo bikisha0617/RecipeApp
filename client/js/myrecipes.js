@@ -63,7 +63,7 @@ function displayRecipes(recipeList) {
         const recipeId = Number(recipe.id);
         const imageUrl =getImageUrl(recipe.image);
         const title =escapeHtml(recipe.title || "Untitled Recipe");
-        const time =escapeHtml(recipe.time + "mins" || "N/A");
+        const time =escapeHtml(recipe.time || "N/A");
         const difficulty = escapeHtml(recipe.difficulty ||"Easy");
         recipeGrid.innerHTML += `
             <div class="recipe-box">

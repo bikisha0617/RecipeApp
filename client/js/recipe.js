@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
             author.textContent ="By " +(data.author || "Recipe App");
         }
         if (time) {
-            time.textContent =data.time + "mins" || "-";
+            time.textContent =data.time  || "-";
         }
         if (servings) {
             servings.textContent =data.servings || "-";

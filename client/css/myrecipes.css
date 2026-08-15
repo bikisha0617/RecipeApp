@@ -60,7 +60,7 @@
     margin-top:15px;
 }
 
-.view-btn,.delete-btn{
+.view-btn,.delete-btn,.edit-btn{
     border:none;
     padding:10px 15px;
     border-radius:8px;
@@ -73,7 +73,12 @@
 }
 
 .delete-btn{
-    background:#b33;
+    background:#7D0633;
+    color:white;
+}
+
+.edit-btn{
+    background:#7D0633;
     color:white;
 }
 
